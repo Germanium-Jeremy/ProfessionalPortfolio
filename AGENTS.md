@@ -1,5 +1,19 @@
 # Application Findings
 
+## Implemented Portfolio Features (2026-10-26)
+
+### Certificates & Awards
+
+- A `Certificate` model stores `title`, `issuer`, `issuedAt`, optional `expiresAt`, `credentialId`, `credentialUrl`, markdown `description`, `fileUrl`/`fileType`/`fileName` for the source material, `isVisible`, and `sortOrder`. Migration: [prisma/migrations/20261026000000_add_certificates](prisma/migrations/20261026000000_add_certificates/migration.sql); apply it with `pnpm prisma:migrate:deploy`.
+- Admin management lives at [/configuration/certificates](<src/app/configuration/(admin)/certificates/page.tsx>), reachable from the `Certificates` sidebar tab. It supports create, edit, delete, a "Show on Portfolio" toggle, a PNG/JPEG/WebP/PDF upload field, and up/down ordering controls.
+- Ordering persists contiguous `sortOrder` values by PATCHing every certificate through [/api/configuration/certificates/[id]](src/app/api/configuration/certificates/[id]/route.ts), the same contract the Projects page uses. Public reads order by `sortOrder` ascending.
+- API routes: [/api/configuration/certificates](src/app/api/configuration/certificates/route.ts) (GET, POST) and [/api/configuration/certificates/[id]](src/app/api/configuration/certificates/[id]/route.ts) (PATCH, DELETE). New certificates are appended after the existing ones unless an explicit `sortOrder` is sent.
+- Validation lives in [src/lib/validation/certificate.ts](src/lib/validation/certificate.ts). Optional text/URL/date fields normalise `""` to `null`, so blank inputs from the admin form do not fail `.url()` or the date check.
+- Source material is uploaded through the existing [POST /api/configuration/upload](src/app/api/configuration/upload/route.ts) route into Vercel Blob (`BLOB_READ_WRITE_TOKEN` required for uploads to work). The stored blob URL is linked from both the admin table and the public card with `target="_blank"`, so reviewers can open the image or PDF.
+- The public section [src/components/public/Certificates.tsx](src/components/public/Certificates.tsx) renders between Testimonials and Contact as index `07`; Contact is now `08`. It uses the new `--section-credentials` background and the `.certificate-*` classes in [src/app/globals.css](src/app/globals.css), and renders nothing when no visible certificates exist.
+- Reads go through [src/lib/repositories/certificateRepository.ts](src/lib/repositories/certificateRepository.ts) (`getCertificates` for admin, `getPublicCertificates` for visible-only).
+- `certificates` was added to the Settings section-layout list; when previously saved settings lack a section, the page appends the missing keys on load instead of dropping them.
+
 ## Implemented Portfolio Features (2026-09-22)
 
 - Project order is controlled from the admin Projects page with up/down controls. The controls persist contiguous `sortOrder` values through the existing project `PATCH` endpoint, and the public page already reads projects in ascending order.
@@ -99,7 +113,7 @@ Recommended fix: revalidate the public paths affected by the project, including 
 
 - [src/lib/auth.ts](src/lib/auth.ts) throws during module initialization if `AUTH_SECRET` is missing. `DATABASE_URL`, `AUTH_SECRET`, and `ENCRYPTION_KEY` must be valid in the environment before the application can start reliably; the expected names and local defaults are listed in [.env.example](.env.example).
 - The Prisma datasource is PostgreSQL, so the database must be reachable and the migration must be applied with `pnpm prisma:migrate:deploy` before configuration saves can work.
-- Configuration API routes protect requests with the session cookie. A missing/expired `portfolio_session` returns `401`; the client pages generally show only a generic save/load error. Check the browser Network response before diagnosing persistence.
+- Configuration API routes protect requests with the session cookie. `requireSession()` calls `redirect()`, so an unauthenticated API request currently surfaces as `500` with `{"code":"INTERNAL_ERROR","message":"NEXT_REDIRECT"}` rather than the `401 UNAUTHENTICATED` payload those routes define (verified for the skills, testimonials, projects, and certificates collections). The client pages generally show only a generic save/load error. Check the browser Network response before diagnosing persistence.
 - [src/lib/repositories/profileRepository.ts](src/lib/repositories/profileRepository.ts) stores `funFacts` as a JSON string in a text column, while public reads parse it. Keep this representation consistent or migrate the column if it is changed.
 
 ## Suggested Repair Order

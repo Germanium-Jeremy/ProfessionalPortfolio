@@ -1,5 +1,18 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+It is a personal portfolio whose content is managed entirely from an admin area at `/configuration` — projects, experience, skills, testimonials, contacts, certificates, and site settings are all added through the CMS, so publishing new content does not require code changes.
+
+## Certificates & awards
+
+Certificates and awards have a dedicated admin tab and a public section, so a new credential can be published as soon as it is earned.
+
+- **Admin tab:** `/configuration/certificates` (sidebar: _Certificates_). Create, edit, and delete records, toggle **Show on Portfolio**, and reorder entries with the up/down controls.
+- **Fields:** title, issuing company, issued date, optional expiry date, optional credential ID, optional verification URL, optional markdown description, and a source-material file.
+- **Source material:** upload a PNG, JPEG, WebP, or PDF. The file is stored in [Vercel Blob](https://vercel.com/docs/storage/vercel-blob) through `POST /api/configuration/upload`, and the returned blob URL is stored on the record. Both the admin table and the public card link to it (`target="_blank"`) so reviewers can open the original document.
+- **Public section:** _Certificates & awards_ renders between Testimonials and Contact (section `07`, Contact is `08`). It is ordered by the admin ordering, and it renders nothing while there are no visible certificates.
+
+To enable uploads, set `BLOB_READ_WRITE_TOKEN` in `.env` (create a Blob store in the Vercel dashboard or run `vercel env pull`). Apply the database change with `pnpm prisma:migrate:deploy` before using the tab.
+
 ## Getting Started
 
 First, run the development server:
