@@ -93,9 +93,8 @@ export function Contact({ channels }: ContactProps) {
     >
       <div className="mx-auto grid max-w-360 gap-12 px-5 py-20 md:px-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:py-28">
         <div>
-          <SectionHeading index="07" title="Contact" invert>
-            Write with a project, an opportunity, or a question. I’ll reply by
-            email.
+          <SectionHeading index="08" title="Contact" invert>
+            Write with a project, an opportunity, or a question. I&#39;ll reply by email.
           </SectionHeading>
           {socials.length > 0 && (
             <ul className="mt-8 space-y-3">
