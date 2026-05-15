@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -25,12 +25,12 @@ model Profile {
   fullName               String
   headline               String
   tagline                String?
-  bio                    String // markdown
+  bio                    String @db.Text // markdown
   avatarUrl              String?
   location               String?
   availability           String?
   resumeUrl              String?
-  funFacts               String? // JSON string array for SQLite
+  funFacts               Json?
   // encrypted
   legalNameCiphertext    Bytes?
   legalNameIv            Bytes?
@@ -70,7 +70,7 @@ model Skill {
   level       Int               @default(3)
   iconKey     String?
   sortOrder   Int               @default(0)
-  isFeatured  Boolean           @default(false)
+  isFeatured Boolean           @default(false)
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt
   experiences ExperienceSkill[]
@@ -88,8 +88,8 @@ model Experience {
   location       String?
   startDate      DateTime
   endDate        DateTime? // null = current
-  description    String // markdown
-  highlights     String? // JSON string array for SQLite
+  description    String @db.Text // markdown
+  highlights     Json?
   sortOrder      Int               @default(0)
   isVisible      Boolean           @default(true)
   createdAt      DateTime          @default(now())
@@ -113,10 +113,10 @@ model Project {
   id            String         @id @default(cuid())
   slug          String         @unique
   title         String
-  summary       String
-  description   String? // markdown
+  summary       String @db.Text
+  description   String? @db.Text // markdown
   coverImageUrl String?
-  gallery       String? // JSON string array for SQLite
+  gallery       Json?
   startDate     DateTime?
   endDate       DateTime?
   status        String         @default("draft")
@@ -176,7 +176,7 @@ model Testimonial {
   authorRole            String?
   authorCompany         String?
   authorAvatarUrl       String?
-  quote                 String
+  quote                 String @db.Text
   rating                Int? // 1..5
   sourceUrl             String?
   isApproved            Boolean  @default(false)
@@ -194,7 +194,7 @@ model Testimonial {
 
 model SiteSetting {
   key       String   @id
-  value     String // JSON string for SQLite
+  value     Json
   updatedAt DateTime @updatedAt
 
   @@map("site_settings")
@@ -206,7 +206,7 @@ model AuditLog {
   action    String
   entity    String
   entityId  String?
-  diff      String? // JSON string for SQLite
+  diff      Json?
   createdAt DateTime @default(now())
   user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
 
