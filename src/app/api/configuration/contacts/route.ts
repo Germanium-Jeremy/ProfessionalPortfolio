@@ -43,9 +43,9 @@ export async function POST(request: NextRequest) {
     const contact = await prisma.contactChannel.create({
       data: {
         ...data,
-        valueCiphertext: enc.ciphertext,
-        valueIv: enc.iv,
-        valueTag: enc.tag,
+        valueCiphertext: Buffer.from(enc.ciphertext),
+        valueIv: Buffer.from(enc.iv),
+        valueTag: Buffer.from(enc.tag),
       },
     });
 
