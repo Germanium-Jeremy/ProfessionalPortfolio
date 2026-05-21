@@ -7,12 +7,12 @@ import { revalidatePath } from 'next/cache';
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await requireSession();
     const body = await request.json();
-    const { id } = params;
+    const { id } = await params;
 
     const result = contactSchema.partial().safeParse(body);
     if (!result.success) {
@@ -36,9 +36,9 @@ export async function PATCH(
       where: { id },
       data: {
         ...data,
-        valueCiphertext: enc?.ciphertext || null,
-        valueIv: enc?.iv || null,
-        valueTag: enc?.tag || null,
+        valueCiphertext: enc ? Buffer.from(enc.ciphertext) : undefined,
+        valueIv: enc ? Buffer.from(enc.iv) : undefined,
+        valueTag: enc ? Buffer.from(enc.tag) : undefined,
       },
     });
 
@@ -54,11 +54,11 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await requireSession();
-    const { id } = params;
+    const { id } = await params;
 
     await prisma.contactChannel.delete({
       where: { id },
