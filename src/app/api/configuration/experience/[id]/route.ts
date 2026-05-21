@@ -6,12 +6,12 @@ import { revalidatePath } from 'next/cache';
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await requireSession();
     const body = await request.json();
-    const { id } = params;
+    const { id } = await params;
 
     const result = experienceSchema.partial().safeParse(body);
     if (!result.success) {
@@ -25,16 +25,22 @@ export async function PATCH(
       }, { status: 400 });
     }
 
-    const { skillIds, ...data } = result.data;
+    const { skillIds, ...rawData } = result.data;
+    const data = {
+      ...rawData,
+      ...(rawData.startDate !== undefined && rawData.startDate !== null ? { startDate: new Date(rawData.startDate) } : {}),
+      ...(rawData.endDate !== undefined ? { endDate: rawData.endDate ? new Date(rawData.endDate) : null } : {}),
+    };
 
     await prisma.experience.update({
       where: { id },
       data: {
         ...data,
         skills: skillIds ? {
-          set: skillIds.map(skillId => ({ skillId }))
+          deleteMany: {},
+          create: skillIds.map(skillId => ({ skillId }))
         } : undefined
-      },
+      } as any,
     });
 
     revalidatePath('/configuration/experience');
@@ -49,11 +55,11 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await requireSession();
-    const { id } = params;
+    const { id } = await params;
 
     await prisma.experience.delete({
       where: { id },
