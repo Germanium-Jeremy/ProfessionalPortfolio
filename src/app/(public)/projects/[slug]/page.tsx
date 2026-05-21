@@ -5,12 +5,13 @@ import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeSanitize from 'rehype-sanitize';
-import { ChevronLeft, ExternalLink, Github, Layout } from 'lucide-react';
+import { ChevronLeft, ExternalLink, GitBranch, Layout } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   const project = await prisma.project.findUnique({
-    where: { slug: params.slug },
+    where: { slug },
   });
 
   if (!project) return { title: 'Project Not Found' };
@@ -21,9 +22,10 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
-export default async function ProjectPage({ params }: { params: { slug: string } }) {
+export default async function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   const project = await prisma.project.findUnique({
-    where: { slug: params.slug },
+    where: { slug },
     include: {
       skills: { include: { skill: true } },
       links: { orderBy: { sortOrder: 'asc' } },
