@@ -48,14 +48,33 @@ export default async function PortfolioPage() {
   }));
 
   const formattedExperiences = experiences.map(e => ({
-    ...e,
+    role: e.role,
+    company: e.company,
+    companyUrl: e.companyUrl ?? undefined,
+    employmentType: e.employmentType ?? undefined,
+    location: e.location ?? undefined,
     startDate: e.startDate.toISOString(),
-    endDate: e.endDate?.toISOString() || undefined,
+    endDate: e.endDate?.toISOString() ?? undefined,
+    description: e.description,
+    highlights: (e.highlights as string[] | null) ?? undefined,
+    skills: e.skills.map(s => ({ skill: { name: s.skill.name } })),
   }));
 
   const formattedProjects = projects.map(p => ({
-    ...p,
-    skills: p.skills.map(s => ({ skill: s.skill })),
+    id: p.id,
+    slug: p.slug,
+    title: p.title,
+    summary: p.summary,
+    coverImageUrl: p.coverImageUrl ?? undefined,
+    status: p.status,
+    isFeatured: p.isFeatured,
+    skills: p.skills.map(s => ({ skill: { name: s.skill.name } })),
+    links: p.links.map(l => ({
+      kind: l.kind,
+      label: l.label,
+      url: l.url,
+      isPrimary: l.isPrimary,
+    })),
   }));
 
   const formattedTestimonials = testimonials.map(t => ({
@@ -80,7 +99,7 @@ export default async function PortfolioPage() {
     .map(c => ({
       kind: c.kind,
       url: 'https://github.com', // This is a placeholder; actual URL would be decrypted or handled
-      iconKey: c.iconKey,
+      iconKey: c.iconKey ?? undefined,
     }));
 
   return (
@@ -97,10 +116,10 @@ export default async function PortfolioPage() {
           profile={{
             fullName: profile.fullName,
             headline: profile.headline,
-            tagline: profile.tagline,
-            avatarUrl: profile.avatarUrl,
-            availability: profile.availability,
-            resumeUrl: profile.resumeUrl,
+            tagline: profile.tagline ?? undefined,
+            avatarUrl: profile.avatarUrl ?? undefined,
+            availability: profile.availability ?? undefined,
+            resumeUrl: profile.resumeUrl ?? undefined,
           }}
           socials={publicSocials}
         />
