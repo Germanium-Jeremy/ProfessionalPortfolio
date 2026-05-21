@@ -6,12 +6,12 @@ import { revalidatePath } from 'next/cache';
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string; factId: string } }
+  { params }: { params: Promise<{ id: string; factId: string }> }
 ) {
   try {
     await requireSession();
     const body = await request.json();
-    const { factId } = params;
+    const { factId } = await params;
 
     const result = projectFactSchema.partial().safeParse(body);
     if (!result.success) {
@@ -42,11 +42,11 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string; factId: string } }
+  { params }: { params: Promise<{ id: string; factId: string }> }
 ) {
   try {
     await requireSession();
-    const { factId } = params;
+    const { factId } = await params;
 
     await prisma.projectFact.delete({
       where: { id: factId },
