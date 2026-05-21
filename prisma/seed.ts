@@ -28,7 +28,7 @@ async function main() {
 
   // Seed initial profile
   await prisma.profile.upsert({
-    where: { id: 'seed-profile-id' }, // In a real scenario we'd use a consistent ID or just create one
+    where: { id: 'seed-profile-id' },
     update: {},
     create: {
       id: 'seed-profile-id',
@@ -38,7 +38,7 @@ async function main() {
       bio: 'Passionate developer with a focus on high-performance applications and interactive systems.',
       location: 'Remote',
       availability: 'Open to freelance',
-      funFacts: ['Coffee enthusiast', 'Indie game jammer', 'Keyboard collector'],
+      funFacts: JSON.stringify(['Coffee enthusiast', 'Indie game jammer', 'Keyboard collector']),
     },
   });
 
@@ -79,9 +79,11 @@ async function main() {
       location: 'Remote',
       startDate: new Date('2021-01-01'),
       description: 'Leading the development of core platform features.',
-      highlights: ['Reduced latency by 40%', 'Mentored 5 junior devs'],
+      highlights: JSON.stringify(['Reduced latency by 40%', 'Mentored 5 junior devs']),
       skills: {
-        connect: skills.filter(s => ['TypeScript', 'React', 'PostgreSQL'].includes(s.name)).map(s => ({ id: s.id }))
+        connect: skills.filter(s => ['TypeScript', 'React', 'PostgreSQL'].includes(s.name)).map(s => ({
+          experienceId_skillId: { experienceId: 'exp-1', skillId: s.id }
+        }))
       }
     }
   });
@@ -98,9 +100,11 @@ async function main() {
       startDate: new Date('2018-06-01'),
       endDate: new Date('2020-12-31'),
       description: 'Developed multiple indie titles for PC and Console.',
-      highlights: ['Shipped 3 titles on Steam', 'Implemented custom physics engine'],
+      highlights: JSON.stringify(['Shipped 3 titles on Steam', 'Implemented custom physics engine']),
       skills: {
-        connect: skills.filter(s => ['C#', 'Unity'].includes(s.name)).map(s => ({ id: s.id }))
+        connect: skills.filter(s => ['C#', 'Unity'].includes(s.name)).map(s => ({
+          experienceId_skillId: { experienceId: 'exp-2', skillId: s.id }
+        }))
       }
     }
   });
@@ -117,9 +121,11 @@ async function main() {
       startDate: new Date('2017-01-01'),
       endDate: new Date('2017-12-31'),
       description: 'Built responsive websites for various clients.',
-      highlights: ['Learned modern CSS techniques', 'Integrated 3rd party APIs'],
+      highlights: JSON.stringify(['Learned modern CSS techniques', 'Integrated 3rd party APIs']),
       skills: {
-        connect: skills.filter(s => ['CSS', 'Git'].includes(s.name)).map(s => ({ id: s.id }))
+        connect: skills.filter(s => ['CSS', 'Git'].includes(s.name)).map(s => ({
+          experienceId_skillId: { experienceId: 'exp-3', skillId: s.id }
+        }))
       }
     }
   });
@@ -142,7 +148,9 @@ async function main() {
         ]
       },
       skills: {
-        connect: skills.filter(s => ['TypeScript', 'Next.js', 'PostgreSQL'].includes(s.name)).map(s => ({ id: s.id }))
+        connect: skills.filter(s => ['TypeScript', 'Next.js', 'PostgreSQL'].includes(s.name)).map(s => ({
+          projectId_skillId: { projectId: 'seed-project-1', skillId: s.id }
+        }))
       }
     }
   });
@@ -162,7 +170,9 @@ async function main() {
         ]
       },
       skills: {
-        connect: skills.filter(s => ['TypeScript', 'Zod'].includes(s.name)).map(s => ({ id: s.id }))
+        connect: skills.filter(s => ['TypeScript', 'Zod'].includes(s.name)).map(s => ({
+          projectId_skillId: { projectId: 'seed-project-2', skillId: s.id }
+        }))
       }
     }
   });
@@ -189,7 +199,9 @@ async function main() {
         ]
       },
       skills: {
-        connect: skills.filter(s => ['C#', 'Unity'].includes(s.name)).map(s => ({ id: s.id }))
+        connect: skills.filter(s => ['C#', 'Unity'].includes(s.name)).map(s => ({
+          projectId_skillId: { projectId: 'seed-project-3', skillId: s.id }
+        }))
       }
     }
   });
@@ -205,7 +217,9 @@ async function main() {
       status: 'published',
       // No links
       skills: {
-        connect: skills.filter(s => ['TypeScript', 'Docker'].includes(s.name)).map(s => ({ id: s.id }))
+        connect: skills.filter(s => ['TypeScript', 'Docker'].includes(s.name)).map(s => ({
+          projectId_skillId: { projectId: 'seed-project-4', skillId: s.id }
+        }))
       }
     }
   });
@@ -231,9 +245,9 @@ async function main() {
         quote: t.quote,
         isFeatured: t.featured,
         isApproved: true,
-        authorEmailCiphertext: encryptedEmail.ciphertext,
-        authorEmailIv: encryptedEmail.iv,
-        authorEmailTag: encryptedEmail.tag,
+        authorEmailCiphertext: Buffer.from(encryptedEmail.ciphertext),
+        authorEmailIv: Buffer.from(encryptedEmail.iv),
+        authorEmailTag: Buffer.from(encryptedEmail.tag),
       }
     });
   }
@@ -255,9 +269,9 @@ async function main() {
         kind: c.kind,
         label: c.label,
         isPublic: c.isPublic,
-        valueCiphertext: encrypted.ciphertext,
-        valueIv: encrypted.iv,
-        valueTag: encrypted.tag,
+        valueCiphertext: Buffer.from(encrypted.ciphertext),
+        valueIv: Buffer.from(encrypted.iv),
+        valueTag: Buffer.from(encrypted.tag),
       }
     });
   }
@@ -265,8 +279,8 @@ async function main() {
   // Seed Site Settings
   await prisma.siteSetting.upsert({
     where: { key: 'accent' },
-    update: { value: { color: '#3b82f6' } },
-    create: { key: 'accent', value: { color: '#3b82f6' } },
+    update: { value: { color: '#3b82f6' } as any },
+    create: { key: 'accent', value: { color: '#3b82f6' } as any },
   });
 
   console.log('Seeding completed successfully.');
