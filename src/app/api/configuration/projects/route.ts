@@ -41,15 +41,20 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    const { skillIds, ...data } = result.data;
+    const { skillIds, ...rawData } = result.data;
+    const data = {
+      ...rawData,
+      startDate: rawData.startDate ? new Date(rawData.startDate) : null,
+      endDate: rawData.endDate ? new Date(rawData.endDate) : null,
+    };
 
     const project = await prisma.project.create({
       data: {
         ...data,
-        skills: {
-          connect: skillIds?.map(id => ({ skillId: id })) || []
-        }
-      },
+        skills: skillIds ? {
+          create: skillIds.map(skillId => ({ skillId }))
+        } : undefined,
+      } as any,
     });
 
     revalidatePath('/configuration/projects');
