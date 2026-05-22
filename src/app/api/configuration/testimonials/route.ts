@@ -46,9 +46,9 @@ export async function POST(request: NextRequest) {
     const testimonial = await prisma.testimonial.create({
       data: {
         ...data,
-        authorEmailCiphertext: emailEnc?.ciphertext || null,
-        authorEmailIv: emailEnc?.iv || null,
-        authorEmailTag: emailEnc?.tag || null,
+      authorEmailCiphertext: emailEnc ? Buffer.from(emailEnc.ciphertext) : null,
+      authorEmailIv: emailEnc ? Buffer.from(emailEnc.iv) : null,
+      authorEmailTag: emailEnc ? Buffer.from(emailEnc.tag) : null,
       },
     });
 
