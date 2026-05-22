@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { RepeatableField } from '@/components/admin/RepeatableField';
 import { toast } from 'sonner';
-import { ChevronLeft, Save, Link as LinkIcon, List, Tag, Image as ImageIcon, FileText } from 'lucide-react';
+import { ChevronLeft, Save, Link as LinkIcon, List, Tag, Image as ImageIcon, FileText, Trash2 } from 'lucide-react';
 
 type Tab = 'basics' | 'description' | 'links' | 'facts' | 'skills' | 'gallery';
 
@@ -30,7 +30,7 @@ export default function ProjectEditor() {
     getValues,
     formState: { errors },
   } = useForm<ProjectInput & { links: ProjectLinkInput[]; facts: ProjectFactInput[]; skillIds: string[] }>({
-    resolver: zodResolver(projectSchema),
+    resolver: zodResolver(projectSchema) as any,
     defaultValues: {
       links: [],
       facts: [],
@@ -41,16 +41,13 @@ export default function ProjectEditor() {
   useEffect(() => {
     async function loadData() {
       try {
-        const [projRes, skillRes] = await Promise.all([
-          isNew ? Promise.resolve({ ok: false }) : fetch(`/api/configuration/projects/${projectId}`),
-          fetch('/api/configuration/skills'),
-        ]);
-
+        const skillRes = await fetch('/api/configuration/skills');
         const skillData = await skillRes.json();
         if (skillData.ok) setSkillsList(skillData.data);
 
         if (!isNew) {
-          const projData = await projRes.json();
+          const projRes2 = await fetch(`/api/configuration/projects/${projectId}`);
+          const projData = await projRes2.json();
           if (projData.ok) {
             const p = projData.data;
             setValue('slug', p.slug);
@@ -58,8 +55,8 @@ export default function ProjectEditor() {
             setValue('summary', p.summary);
             setValue('description', p.description);
             setValue('coverImageUrl', p.coverImageUrl);
-            setValue('startDate', p.startDate ? new Date(p.startDate).toISOString() : '');
-            setValue('endDate', p.endDate ? new Date(p.endDate).toISOString() : '');
+            setValue('startDate', p.startDate ? new Date(p.startDate).toISOString().slice(0, 10) : '');
+            setValue('endDate', p.endDate ? new Date(p.endDate).toISOString().slice(0, 10) : '');
             setValue('status', p.status);
             setValue('isFeatured', p.isFeatured);
             setValue('sortOrder', p.sortOrder);
@@ -348,8 +345,8 @@ export default function ProjectEditor() {
                     size="sm"
                     className="absolute top-1 right-1 h-6 w-6 p-0"
                     onClick={() => {
-                      const current = getValues('gallery');
-                      setValue('gallery', current.filter((_, i) => i !== index));
+                      const current = getValues('gallery') || [];
+                      setValue('gallery', current.filter((_: string, i: number) => i !== index));
                     }}
                   >
                     <Trash2 className="w-3 h-3" />
