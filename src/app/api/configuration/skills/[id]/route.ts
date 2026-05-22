@@ -6,12 +6,12 @@ import { revalidatePath } from 'next/cache';
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await requireSession();
     const body = await request.json();
-    const { id } = params;
+    const { id } = await params;
 
     const result = skillSchema.partial().safeParse(body);
     if (!result.success) {
@@ -42,11 +42,11 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await requireSession();
-    const { id } = params;
+    const { id } = await params;
 
     await prisma.skill.delete({
       where: { id },
