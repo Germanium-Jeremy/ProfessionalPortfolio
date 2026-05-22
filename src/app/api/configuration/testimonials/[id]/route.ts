@@ -7,12 +7,12 @@ import { revalidatePath } from 'next/cache';
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await requireSession();
     const body = await request.json();
-    const { id } = params;
+    const { id } = await params;
 
     const result = testimonialSchema.partial().safeParse(body);
     if (!result.success) {
@@ -36,9 +36,9 @@ export async function PATCH(
       where: { id },
       data: {
         ...data,
-        authorEmailCiphertext: emailEnc?.ciphertext || null,
-        authorEmailIv: emailEnc?.iv || null,
-        authorEmailTag: emailEnc?.tag || null,
+        authorEmailCiphertext: emailEnc ? Buffer.from(emailEnc.ciphertext) : null,
+        authorEmailIv: emailEnc ? Buffer.from(emailEnc.iv) : null,
+        authorEmailTag: emailEnc ? Buffer.from(emailEnc.tag) : null,
       },
     });
 
@@ -54,11 +54,11 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await requireSession();
-    const { id } = params;
+    const { id } = await params;
 
     await prisma.testimonial.delete({
       where: { id },
