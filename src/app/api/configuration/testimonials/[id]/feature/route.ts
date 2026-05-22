@@ -5,11 +5,11 @@ import { revalidatePath } from 'next/cache';
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await requireSession();
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
     const isFeatured = body.isFeatured;
 
