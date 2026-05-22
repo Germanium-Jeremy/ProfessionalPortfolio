@@ -1,15 +1,8 @@
-import { Profile } from '@prisma/client';
 import { prisma } from '../db';
-import { encrypt, decrypt, blindIndex } from '../crypto';
-
-// Helper to encrypt a string field if it exists
-function encryptField(text: string | null | undefined) {
-  if (!text) return null;
-  return encrypt(text);
-}
+import { encrypt, decrypt } from '../crypto';
 
 // Helper to decrypt a field if it exists
-function decryptField(ciphertext: Buffer | null, iv: Buffer | null, tag: Buffer | null): string | null {
+function decryptField(ciphertext: Uint8Array | null, iv: Uint8Array | null, tag: Uint8Array | null): string | null {
   if (!ciphertext || !iv || !tag) return null;
   try {
     return decrypt({ ciphertext, iv, tag });
@@ -45,7 +38,7 @@ export async function getPublicProfile() {
     location: profile.location,
     availability: profile.availability,
     resumeUrl: profile.resumeUrl,
-    funFacts: profile.funFacts ? JSON.parse(profile.funFacts) : [],
+    funFacts: profile.funFacts ? JSON.parse(profile.funFacts as string) : [],
   };
 }
 
@@ -58,7 +51,7 @@ export async function updateProfile(data: {
   location?: string | null;
   availability?: string | null;
   resumeUrl?: string | null;
-  funFacts?: string[];
+  funFacts?: string[] | null;
   legalName?: string | null;
   privateNotes?: string | null;
 }) {
@@ -78,13 +71,13 @@ export async function updateProfile(data: {
     resumeUrl: data.resumeUrl,
     funFacts: data.funFacts ? JSON.stringify(data.funFacts) : null,
     
-    legalNameCiphertext: legalNameEnc?.ciphertext || null,
-    legalNameIv: legalNameEnc?.iv || null,
-    legalNameTag: legalNameEnc?.tag || null,
+    legalNameCiphertext: legalNameEnc ? Buffer.from(legalNameEnc.ciphertext) : null,
+    legalNameIv: legalNameEnc ? Buffer.from(legalNameEnc.iv) : null,
+    legalNameTag: legalNameEnc ? Buffer.from(legalNameEnc.tag) : null,
     
-    privateNotesCiphertext: privateNotesEnc?.ciphertext || null,
-    privateNotesIv: privateNotesEnc?.iv || null,
-    privateNotesTag: privateNotesEnc?.tag || null,
+    privateNotesCiphertext: privateNotesEnc ? Buffer.from(privateNotesEnc.ciphertext) : null,
+    privateNotesIv: privateNotesEnc ? Buffer.from(privateNotesEnc.iv) : null,
+    privateNotesTag: privateNotesEnc ? Buffer.from(privateNotesEnc.tag) : null,
   };
 
   if (existing) {
