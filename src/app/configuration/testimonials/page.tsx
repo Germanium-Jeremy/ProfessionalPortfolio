@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { DataTable, type Column } from '@/components/admin/DataTable';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
 
