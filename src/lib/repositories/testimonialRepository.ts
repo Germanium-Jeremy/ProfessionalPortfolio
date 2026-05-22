@@ -71,9 +71,9 @@ export async function createTestimonial(data: {
       isApproved: data.isApproved ?? false,
       isFeatured: data.isFeatured ?? false,
       sortOrder: data.sortOrder ?? 0,
-      authorEmailCiphertext: emailEnc?.ciphertext || null,
-      authorEmailIv: emailEnc?.iv || null,
-      authorEmailTag: emailEnc?.tag || null,
+      authorEmailCiphertext: emailEnc ? Buffer.from(emailEnc.ciphertext) : null,
+      authorEmailIv: emailEnc ? Buffer.from(emailEnc.iv) : null,
+      authorEmailTag: emailEnc ? Buffer.from(emailEnc.tag) : null,
     },
   });
 }
