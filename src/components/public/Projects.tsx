@@ -3,7 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ExternalLink, Github, Layout } from 'lucide-react';
+import { ExternalLink, GitBranch, Layout } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface Project {
@@ -97,7 +97,7 @@ export function Projects({ projects }: ProjectsProps) {
                       className="p-2 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors"
                       aria-label={primaryLink.label}
                     >
-                      {primaryLink.kind === 'github' ? <Github className="w-4 h-4" /> : <ExternalLink className="w-4 h-4" />}
+                      {primaryLink.kind === 'github' ? <GitBranch className="w-4 h-4" /> : <ExternalLink className="w-4 h-4" />}
                     </a>
                   )}
                 </div>
