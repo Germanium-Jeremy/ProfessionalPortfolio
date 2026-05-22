@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Mail, Phone, Globe, Github, Linkedin, Twitter, MessageSquare, ExternalLink } from 'lucide-react';
+import { Mail, Phone, Globe, GitBranch, Link, MessageSquare, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface ContactChannel {
@@ -43,9 +43,9 @@ export function Contact({ channels }: ContactProps) {
       case 'email': return <Mail className="w-5 h-5" />;
       case 'phone': return <Phone className="w-5 h-5" />;
       case 'whatsapp': return <MessageSquare className="w-5 h-5" />;
-      case 'linkedin': return <Linkedin className="w-5 h-5" />;
-      case 'github': return <Github className="w-5 h-5" />;
-      case 'x': return <Twitter className="w-5 h-5" />;
+      case 'linkedin': return <Link className="w-5 h-5" />;
+      case 'github': return <GitBranch className="w-5 h-5" />;
+      case 'x': return <MessageSquare className="w-5 h-5" />;
       case 'website': return <Globe className="w-5 h-5" />;
       default: return <ExternalLink className="w-5 h-5" />;
     }
