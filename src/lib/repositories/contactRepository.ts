@@ -65,9 +65,9 @@ export async function createContact(data: {
       iconKey: data.iconKey,
       isPublic: data.isPublic,
       sortOrder: data.sortOrder ?? 0,
-      valueCiphertext: encrypted.ciphertext,
-      valueIv: encrypted.iv,
-      valueTag: encrypted.tag,
+      valueCiphertext: Buffer.from(encrypted.ciphertext),
+      valueIv: Buffer.from(encrypted.iv),
+      valueTag: Buffer.from(encrypted.tag),
       valueBlindIndex: bIndex,
     },
   });
@@ -85,9 +85,9 @@ export async function updateContact(id: string, data: {
 
   if (data.value !== undefined) {
     const encrypted = encrypt(data.value);
-    updateData.valueCiphertext = encrypted.ciphertext;
-    updateData.valueIv = encrypted.iv;
-    updateData.valueTag = encrypted.tag;
+    updateData.valueCiphertext = Buffer.from(encrypted.ciphertext);
+    updateData.valueIv = Buffer.from(encrypted.iv);
+    updateData.valueTag = Buffer.from(encrypted.tag);
     updateData.valueBlindIndex = blindIndex(data.value);
     delete updateData.value;
   }
