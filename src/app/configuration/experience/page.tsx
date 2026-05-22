@@ -14,7 +14,7 @@ interface Experience {
   startDate: string;
   endDate: string | null;
   description: string;
-  skills: { skill: { name: string } }[];
+  skills: { skill: { id: string; name: string } }[];
 }
 
 export default function ExperiencePage() {
