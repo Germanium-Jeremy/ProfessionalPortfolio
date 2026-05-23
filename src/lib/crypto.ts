@@ -8,7 +8,7 @@ if (!ENCRYPTION_KEY || Buffer.from(ENCRYPTION_KEY, 'base64').length !== 32) {
 
 const keyBuffer = Buffer.from(ENCRYPTION_KEY, 'base64');
 
-export function encrypt(plaintext: string): { ciphertext: Buffer; iv: Buffer; tag: Buffer } {
+export function encrypt(plaintext: string): { ciphertext: Uint8Array; iv: Uint8Array; tag: Uint8Array } {
   const iv = crypto.randomBytes(12);
   const cipher = crypto.createCipheriv('aes-256-gcm', keyBuffer, iv);
   
@@ -18,17 +18,17 @@ export function encrypt(plaintext: string): { ciphertext: Buffer; iv: Buffer; ta
   return { ciphertext, iv, tag };
 }
 
-export function decrypt(input: { ciphertext: Buffer; iv: Buffer; tag: Buffer }): string {
-  const decipher = crypto.createDecipheriv('aes-256-gcm', keyBuffer, input.iv);
-  decipher.setAuthTag(input.tag);
+export function decrypt(input: { ciphertext: Uint8Array; iv: Uint8Array; tag: Uint8Array }): string {
+  const decipher = crypto.createDecipheriv('aes-256-gcm', keyBuffer, Buffer.from(input.iv));
+  decipher.setAuthTag(Buffer.from(input.tag));
   
-  const decrypted = Buffer.concat([decipher.update(input.ciphertext), decipher.final()]);
+  const decrypted = Buffer.concat([decipher.update(Buffer.from(input.ciphertext)), decipher.final()]);
   return decrypted.toString('utf8');
 }
 
 export function encryptString(plaintext: string): string {
   const { ciphertext, iv, tag } = encrypt(plaintext);
-  return `v1:${iv.toString('base64url')}:${tag.toString('base64url')}:${ciphertext.toString('base64url')}`;
+  return `v1:${Buffer.from(iv).toString('base64url')}:${Buffer.from(tag).toString('base64url')}:${Buffer.from(ciphertext).toString('base64url')}`;
 }
 
 export function decryptString(packed: string): string {
