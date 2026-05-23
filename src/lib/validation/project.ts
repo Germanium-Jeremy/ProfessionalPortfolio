@@ -5,10 +5,10 @@ export const projectSchema = z.object({
   title: z.string().min(1).max(200),
   summary: z.string().min(1).max(500),
   description: z.string().max(20000).nullable().optional(),
-  coverImageUrl: z.string().url().nullable().optional(),
+  coverImageUrl: z.string().nullable().optional(),
   gallery: z.array(z.string().url()).nullable().optional(),
-  startDate: z.string().datetime().nullable().optional().transform(val => val ? new Date(val) : null),
-  endDate: z.string().datetime().nullable().optional().transform(val => val ? new Date(val) : null),
+  startDate: z.string().nullable().optional(),
+  endDate: z.string().nullable().optional(),
   status: z.enum(['draft', 'published']).default('draft'),
   isFeatured: z.boolean().default(false),
   sortOrder: z.number().int().default(0),
@@ -16,7 +16,7 @@ export const projectSchema = z.object({
 }).strict();
 
 export const projectLinkSchema = z.object({
-  kind: z.enum(['live', 'github', 'gdrive', 'unity_cloud', 'itch', 'figma', 'video', 'npm', 'docs', 'play_store', 'app_store', 'other']),
+  kind: z.string().min(1).max(50),
   label: z.string().min(1).max(100),
   url: z.string().url(),
   isPrimary: z.boolean().default(false),
