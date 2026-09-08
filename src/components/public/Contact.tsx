@@ -1,96 +1,16 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Mail, Phone, Globe, GitBranch, Link, MessageSquare, ExternalLink } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { useState, type ReactNode } from 'react';
+import { ArrowUpRight, Globe2, Mail, MessageCircle, Phone, GitBranch } from 'lucide-react';
 
-interface ContactChannel {
-  id: string;
-  kind: string;
-  label: string;
-  value: string | null; // revealed value
-}
+interface ContactChannel { id: string; kind: string; label: string; value: string | null }
+interface ContactProps { channels: ContactChannel[] }
 
-interface ContactProps {
-  channels: ContactChannel[];
-}
+const icons: Record<string, ReactNode> = { email: <Mail className="h-5 w-5" />, phone: <Phone className="h-5 w-5" />, github: <GitBranch className="h-5 w-5" />, website: <Globe2 className="h-5 w-5" />, whatsapp: <MessageCircle className="h-5 w-5" /> };
 
 export function Contact({ channels }: ContactProps) {
   const [revealed, setRevealed] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState<Record<string, boolean>>({});
-
-  async function handleReveal(id: string) {
-    setLoading(prev => ({ ...prev, [id]: true }));
-    try {
-      const res = await fetch(`/api/public/reveal`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id }),
-      });
-      const result = await res.json();
-      if (result.ok) {
-        setRevealed(prev => ({ ...prev, [id]: result.data.value }));
-      }
-    } catch (err) {
-      console.error('Reveal failed', err);
-    } finally {
-      setLoading(prev => ({ ...prev, [id]: false }));
-    }
-  }
-
-  const getIcon = (kind: string) => {
-    switch (kind) {
-      case 'email': return <Mail className="w-5 h-5" />;
-      case 'phone': return <Phone className="w-5 h-5" />;
-      case 'whatsapp': return <MessageSquare className="w-5 h-5" />;
-      case 'linkedin': return <Link className="w-5 h-5" />;
-      case 'github': return <GitBranch className="w-5 h-5" />;
-      case 'x': return <MessageSquare className="w-5 h-5" />;
-      case 'website': return <Globe className="w-5 h-5" />;
-      default: return <ExternalLink className="w-5 h-5" />;
-    }
-  };
-
-  return (
-    <section id="contact" className="py-20 space-y-12 max-w-4xl mx-auto px-4">
-      <div className="text-center space-y-4">
-        <h2 className="text-3xl md:text-4xl font-bold">Get in Touch</h2>
-        <div className="w-12 h-1 bg-blue-600 mx-auto rounded-full" />
-        <p className="text-slate-500 dark:text-slate-400">Feel free to reach out through any of these channels.</p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {channels.map((channel, i) => {
-          const isRevealed = !!revealed[channel.id];
-          const value = revealed[channel.id] || '••••••••';
-
-          return (
-            <div key={i} className="p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-between group hover:border-blue-500 transition-colors">
-              <div className="flex items-center gap-4">
-                <div className="p-3 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 group-hover:text-blue-500 transition-colors">
-                  {getIcon(channel.kind)}
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">{channel.label}</span>
-                  <span className="text-lg font-semibold text-slate-700 dark:text-slate-200">{value}</span>
-                </div>
-              </div>
-
-              {!isRevealed && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleReveal(channel.id)}
-                  disabled={loading[channel.id]}
-                  className="h-8 px-3 text-xs"
-                >
-                  {loading[channel.id] ? '...' : 'Reveal'}
-                </Button>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </section>
-  );
+  async function reveal(id: string) { setLoading((current) => ({ ...current, [id]: true })); try { const response = await fetch('/api/public/reveal', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) }); const result = await response.json(); if (result.ok) setRevealed((current) => ({ ...current, [id]: result.data.value })); } finally { setLoading((current) => ({ ...current, [id]: false })); } }
+  return <section id="contact" className="mx-auto max-w-[90rem] px-5 py-20 md:px-10 lg:py-32"><div className="relative overflow-hidden rounded-[2rem] border border-cyan-200/20 bg-[radial-gradient(circle_at_85%_12%,rgba(34,211,238,.2),transparent_24%),linear-gradient(125deg,#102d4b,#101936)] p-7 md:p-12"><div className="absolute -bottom-24 -right-20 text-[16rem] font-black leading-none tracking-[-.15em] text-white/[.035]">Hi</div><div className="relative grid gap-10 lg:grid-cols-[1fr_.8fr]"><div><p className="section-kicker text-cyan-100">07 / Contact</p><h2 className="mt-4 max-w-xl text-4xl font-black tracking-[-0.07em] text-white md:text-6xl">Let’s make the next thing memorable.</h2><p className="mt-5 max-w-md text-sm leading-7 text-slate-300 md:text-base">Have a project, an opportunity, or just a good idea? I’d love to hear about it.</p></div><div className="grid content-start gap-3">{channels.map((channel) => { const value = revealed[channel.id]; return <div key={channel.id} className="group flex items-center justify-between rounded-2xl border border-white/10 bg-[#07111f]/35 p-4 backdrop-blur"><div className="flex min-w-0 items-center gap-3"><span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-cyan-200/10 text-cyan-100">{icons[channel.kind] ?? <ArrowUpRight className="h-5 w-5" />}</span><div className="min-w-0"><p className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-500">{channel.label}</p><p className="truncate text-sm font-medium text-slate-100">{value ?? '••••••••••••'}</p></div></div>{value ? <span className="text-xs text-emerald-200">Ready</span> : <button onClick={() => reveal(channel.id)} disabled={loading[channel.id]} className="rounded-full border border-white/15 px-3 py-1.5 text-xs font-semibold text-cyan-100 transition hover:border-cyan-100 disabled:opacity-50">{loading[channel.id] ? 'Loading' : 'Reveal'}</button>}</div>})}</div></div></div></section>;
 }
