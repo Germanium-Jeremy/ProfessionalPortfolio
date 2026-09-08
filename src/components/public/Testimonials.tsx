@@ -1,80 +1,11 @@
 'use client';
 
-import React from 'react';
+import { ExternalLink, Quote, Star } from 'lucide-react';
 
-interface Testimonial {
-  authorName: string;
-  authorRole: string | null;
-  authorCompany: string | null;
-  authorAvatarUrl: string | null;
-  quote: string;
-  rating: number | null;
-  sourceUrl: string | null;
-}
-
-interface TestimonialsProps {
-  testimonials: Testimonial[];
-}
+interface Testimonial { authorName: string; authorRole: string | null; authorCompany: string | null; authorAvatarUrl: string | null; quote: string; rating: number | null; sourceUrl: string | null }
+interface TestimonialsProps { testimonials: Testimonial[] }
 
 export function Testimonials({ testimonials }: TestimonialsProps) {
-  if (testimonials.length === 0) return null;
-
-  return (
-    <section id="testimonials" className="py-20 space-y-12 max-w-6xl mx-auto px-4">
-      <div className="text-center space-y-4">
-        <h2 className="text-3xl md:text-4xl font-bold">Testimonials</h2>
-        <div className="w-12 h-1 bg-blue-600 mx-auto rounded-full" />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {testimonials.map((t, i) => (
-          <div key={i} className="p-8 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm relative">
-            <div className="flex gap-1 mb-4">
-              {Array.from({ length: 5 }).map((_, idx) => (
-                <span key={idx} className={cn(
-                  "text-sm",
-                  idx < (t.rating || 0) ? "text-yellow-500" : "text-slate-300 dark:text-slate-600"
-                )}>★</span>
-              ))}
-            </div>
-            <p className="text-slate-600 dark:text-slate-300 italic mb-6">"{t.quote}"</p>
-            <div className="flex items-center gap-4">
-              {t.authorAvatarUrl ? (
-                <img src={t.authorAvatarUrl} alt={t.authorName} className="w-12 h-12 rounded-full object-cover" />
-              ) : (
-                <div className="w-12 h-12 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-slate-400">
-                  {t.authorName[0]}
-                </div>
-              )}
-              <div className="flex flex-col">
-                <span className="font-bold text-sm">{t.authorName}</span>
-                <span className="text-xs text-slate-500">{t.authorRole} @ {t.authorCompany}</span>
-              </div>
-            </div>
-            {t.sourceUrl && (
-              <a
-                href={t.sourceUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="absolute top-4 right-4 text-slate-400 hover:text-blue-500 transition-colors"
-                aria-label="View source"
-              >
-                <ExternalLinkIcon />
-              </a>
-            )}
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function ExternalLinkIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="16" y1="3" x2="16" y2="9"/></svg>
-  );
-}
-
-function cn(...classes: (string | boolean | undefined)[]) {
-  return classes.filter(Boolean).join(' ');
+  if (!testimonials.length) return null;
+  return <section id="testimonials" className="mx-auto max-w-[90rem] px-5 py-20 md:px-10 lg:py-32"><div className="mb-12"><p className="section-kicker">06 / Testimonials</p><h2 className="mt-4 text-4xl font-black tracking-[-0.06em] text-white md:text-6xl">Kind words from good people.</h2></div><div className="grid gap-4 lg:grid-cols-3">{testimonials.map((testimonial) => <figure key={`${testimonial.authorName}-${testimonial.quote}`} className="relative flex min-h-72 flex-col rounded-[2rem] border border-white/10 bg-white/[0.045] p-7 md:p-8"><Quote className="mb-5 h-7 w-7 text-cyan-200" /><blockquote className="text-lg leading-8 tracking-[-0.01em] text-slate-200">“{testimonial.quote}”</blockquote><figcaption className="mt-auto flex items-end justify-between gap-3 pt-8"><div className="flex items-center gap-3">{testimonial.authorAvatarUrl ? <img src={testimonial.authorAvatarUrl} alt="" className="h-10 w-10 rounded-full object-cover" /> : <span className="grid h-10 w-10 place-items-center rounded-full bg-cyan-200/10 text-sm font-bold text-cyan-100">{testimonial.authorName[0]}</span>}<div><p className="text-sm font-bold text-white">{testimonial.authorName}</p><p className="text-xs text-slate-500">{[testimonial.authorRole, testimonial.authorCompany].filter(Boolean).join(' · ')}</p></div></div><div>{testimonial.rating && <div className="flex gap-0.5 text-cyan-200">{Array.from({ length: testimonial.rating }, (_, index) => <Star key={index} className="h-3 w-3 fill-current" />)}</div>}{testimonial.sourceUrl && <a href={testimonial.sourceUrl} target="_blank" rel="noopener noreferrer" aria-label="View testimonial source" className="mt-2 inline-flex text-slate-400 hover:text-white"><ExternalLink className="h-4 w-4" /></a>}</div></figcaption></figure>)}</div></section>;
 }
