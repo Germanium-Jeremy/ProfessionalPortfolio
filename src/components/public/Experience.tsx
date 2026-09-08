@@ -1,84 +1,12 @@
 'use client';
 
-import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeSanitize from 'rehype-sanitize';
 
-interface ExperienceProps {
-  experiences: {
-    role: string;
-    company: string;
-    companyUrl?: string;
-    employmentType?: string;
-    location?: string;
-    startDate: string;
-    endDate?: string;
-    description: string;
-    highlights?: string[];
-    skills: { skill: { name: string } }[];
-  }[];
-}
+interface ExperienceProps { experiences: { role: string; company: string; companyUrl?: string; employmentType?: string; location?: string; startDate: string; endDate?: string; description: string; highlights?: string[]; skills: { skill: { name: string } }[] }[] }
+const date = (value: string) => new Date(value).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 
 export function Experience({ experiences }: ExperienceProps) {
-  return (
-    <section id="experience" className="py-20 space-y-12 max-w-4xl mx-auto px-4">
-      <div className="text-center space-y-4">
-        <h2 className="text-3xl md:text-4xl font-bold">Experience</h2>
-        <div className="w-12 h-1 bg-blue-600 mx-auto rounded-full" />
-      </div>
-
-      <div className="relative space-y-12 before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-300 dark:before:via-slate-700 before:to-transparent">
-        {experiences.map((exp, i) => (
-          <div key={i} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
-            <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white dark:border-slate-900 bg-slate-200 dark:bg-slate-800 text-slate-500 shrink-0 md:absolute md:left-1/2 md:-translate-x-1/2 z-10">
-              <div className="w-2 h-2 rounded-full bg-blue-500" />
-            </div>
-            <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow">
-              <div className="flex flex-col mb-4">
-                <h3 className="text-xl font-bold">{exp.role}</h3>
-                <div className="flex flex-wrap items-center gap-2 text-sm text-slate-500">
-                  {exp.companyUrl ? (
-                    <a href={exp.companyUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-medium">{exp.company}</a>
-                  ) : (
-                    <span>{exp.company}</span>
-                  )}
-                  {exp.employmentType && <span>• {exp.employmentType}</span>}
-                  {exp.location && <span>• {exp.location}</span>}
-                </div>
-                <div className="text-xs font-medium text-slate-400 mt-1">
-                  {new Date(exp.startDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })} — {exp.endDate ? new Date(exp.endDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'Present'}
-                </div>
-              </div>
-
-              <div className="prose dark:prose-invert text-sm text-slate-600 dark:text-slate-300 mb-4">
-                <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSanitize]}>
-                  {exp.description}
-                </ReactMarkdown>
-              </div>
-
-              {exp.highlights && exp.highlights.length > 0 && (
-                <ul className="space-y-2 mb-4">
-                  {exp.highlights.map((h, idx) => (
-                    <li key={idx} className="text-sm flex items-start gap-2 text-slate-600 dark:text-slate-400">
-                      <span className="text-blue-500 mt-1">•</span>
-                      {h}
-                    </li>
-                  ))}
-                </ul>
-              )}
-
-              <div className="flex flex-wrap gap-2">
-                {exp.skills.map((s, idx) => (
-                  <span key={idx} className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-700 text-[10px] font-medium text-slate-500 dark:text-slate-400">
-                    {s.skill.name}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
+  return <section id="experience" className="mx-auto max-w-[90rem] px-5 py-20 md:px-10 lg:py-32"><div className="mb-12"><p className="section-kicker">04 / Experience</p><h2 className="mt-4 text-4xl font-black tracking-[-0.06em] text-white md:text-6xl">Where I’ve made an impact.</h2></div><div className="border-t border-white/10">{experiences.map((experience, index) => <article key={`${experience.company}-${experience.role}`} className="grid gap-5 border-b border-white/10 py-8 md:grid-cols-[.35fr_1.15fr_.5fr] md:gap-8 md:py-11"><p className="text-xs font-semibold uppercase tracking-[0.16em] text-cyan-200/80">{date(experience.startDate)}<br />{experience.endDate ? date(experience.endDate) : 'Present'}</p><div><p className="mb-2 text-xs text-slate-500">0{index + 1}</p><h3 className="text-2xl font-bold tracking-[-0.04em] text-white">{experience.role}</h3><div className="mt-2 flex flex-wrap gap-x-2 text-sm text-slate-400">{experience.companyUrl ? <a className="font-medium text-cyan-100 hover:underline" target="_blank" rel="noopener noreferrer" href={experience.companyUrl}>{experience.company}</a> : <span>{experience.company}</span>}{experience.employmentType && <span>· {experience.employmentType}</span>}{experience.location && <span>· {experience.location}</span>}</div><div className="portfolio-prose mt-5 text-sm leading-7 text-slate-300"><ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSanitize]}>{experience.description}</ReactMarkdown></div>{experience.highlights && <ul className="mt-5 space-y-2 text-sm text-slate-400">{experience.highlights.map((highlight) => <li key={highlight} className="flex gap-2"><span className="text-cyan-200">↗</span>{highlight}</li>)}</ul>}</div><div className="flex flex-wrap content-start gap-2 md:justify-end">{experience.skills.map(({ skill }) => <span className="h-fit rounded-full border border-white/10 px-3 py-1 text-[11px] text-slate-400" key={skill.name}>{skill.name}</span>)}</div></article>)}</div></section>;
 }
