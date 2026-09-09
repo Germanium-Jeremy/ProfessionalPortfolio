@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -25,7 +25,7 @@ model Profile {
   fullName               String
   headline               String
   tagline                String?
-  bio                    String @db.Text // markdown
+  bio                    String // markdown
   avatarUrl              String?
   location               String?
   availability           String?
@@ -88,7 +88,7 @@ model Experience {
   location       String?
   startDate      DateTime
   endDate        DateTime? // null = current
-  description    String @db.Text // markdown
+  description    String // markdown
   highlights     Json?
   sortOrder      Int               @default(0)
   isVisible      Boolean           @default(true)
@@ -113,8 +113,8 @@ model Project {
   id            String         @id @default(cuid())
   slug          String         @unique
   title         String
-  summary       String @db.Text
-  description   String? @db.Text // markdown
+  summary       String
+  description   String? // markdown
   coverImageUrl String?
   gallery       Json?
   startDate     DateTime?
@@ -176,7 +176,7 @@ model Testimonial {
   authorRole            String?
   authorCompany         String?
   authorAvatarUrl       String?
-  quote                 String @db.Text
+  quote                 String
   rating                Int? // 1..5
   sourceUrl             String?
   isApproved            Boolean  @default(false)
