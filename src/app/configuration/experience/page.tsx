@@ -178,7 +178,48 @@ export default function ExperiencePage() {
             />
           </div>
           <div className="space-y-2">
-            <label className="block text-sm font-medium">Skills</label>
+            <div className="flex items-center justify-between">
+              <label className="block text-sm font-medium">Skills</label>
+              <div className="flex gap-2">
+                <Input
+                  placeholder="New skill name..."
+                  className="h-8 w-48 text-xs"
+                  id="exp-new-skill-input"
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 text-xs"
+                  onClick={async () => {
+                    const input = document.getElementById('exp-new-skill-input') as HTMLInputElement;
+                    const name = input.value.trim();
+                    if (!name) return;
+
+                    try {
+                      const res = await fetch('/api/configuration/skills', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name, category: 'tool', level: 3, isFeatured: false }),
+                      });
+                      const result = await res.json();
+                      if (result.ok) {
+                        const newSkill = result.data;
+                        setSkills(prev => [...prev, newSkill]);
+                        setNewExp(prev => ({ ...prev, skillIds: [...prev.skillIds, newSkill.id] }));
+                        input.value = '';
+                        toast.success(`Skill "${name}" added`);
+                      } else {
+                        toast.error(result.error?.message || 'Failed to add skill');
+                      }
+                    } catch (err) {
+                      toast.error('An unexpected error occurred');
+                    }
+                  }}
+                >
+                  Add New
+                </Button>
+              </div>
+            </div>
             <div className="flex flex-wrap gap-2 p-3 border border-slate-300 dark:border-slate-600 rounded-md bg-slate-50 dark:bg-slate-900">
               {skills.map(s => (
                 <label key={s.id} className="flex items-center gap-2 px-2 py-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-xs cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700">
