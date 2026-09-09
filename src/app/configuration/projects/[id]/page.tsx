@@ -173,7 +173,7 @@ export default function ProjectEditor() {
               </label>
               <select
                 {...register('status')}
-                className="px-3 py-1 border border-slate-300 dark:border-slate-600 rounded-md bg-transparent text-sm"
+                className="px-3 py-1 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm"
               >
                 <option value="draft">Draft</option>
                 <option value="published">Published</option>
@@ -212,8 +212,8 @@ export default function ProjectEditor() {
                   <select
                     value={link.kind}
                     onChange={e => {
-                      const current = getValues('links');
-                      current[index].kind = e.target.value;
+                      const current = [...getValues('links')];
+                      current[index] = { ...current[index], kind: e.target.value };
                       setValue('links', current);
                     }}
                     className="w-full px-2 py-1 border border-slate-300 dark:border-slate-600 rounded bg-transparent text-xs"
@@ -231,8 +231,8 @@ export default function ProjectEditor() {
                   <Input
                     value={link.label}
                     onChange={e => {
-                      const current = getValues('links');
-                      current[index].label = e.target.value;
+                      const current = [...getValues('links')];
+                      current[index] = { ...current[index], label: e.target.value };
                       setValue('links', current);
                     }}
                     className="h-8 text-xs"
@@ -243,8 +243,8 @@ export default function ProjectEditor() {
                   <Input
                     value={link.url}
                     onChange={e => {
-                      const current = getValues('links');
-                      current[index].url = e.target.value;
+                      const current = [...getValues('links')];
+                      current[index] = { ...current[index], url: e.target.value };
                       setValue('links', current);
                     }}
                     className="h-8 text-xs"
@@ -256,9 +256,10 @@ export default function ProjectEditor() {
                       type="checkbox"
                       checked={link.isPrimary}
                       onChange={e => {
-                        const current = getValues('links');
-                        current.forEach((l, i) => { if(i !== index) l.isPrimary = false; });
-                        current[index].isPrimary = e.target.checked;
+                        const current = getValues('links').map((l, i) => ({
+                          ...l,
+                          isPrimary: i === index ? e.target.checked : false
+                        }));
                         setValue('links', current);
                       }}
                     />
@@ -288,8 +289,8 @@ export default function ProjectEditor() {
                   placeholder="Label (e.g. Team Size)"
                   value={fact.label}
                   onChange={e => {
-                    const current = getValues('facts');
-                    current[index].label = e.target.value;
+                    const current = [...getValues('facts')];
+                    current[index] = { ...current[index], label: e.target.value };
                     setValue('facts', current);
                   }}
                   className="h-8 text-xs"
@@ -298,8 +299,8 @@ export default function ProjectEditor() {
                   placeholder="Value (e.g. 4)"
                   value={fact.value}
                   onChange={e => {
-                    const current = getValues('facts');
-                    current[index].value = e.target.value;
+                    const current = [...getValues('facts')];
+                    current[index] = { ...current[index], value: e.target.value };
                     setValue('facts', current);
                   }}
                   className="h-8 text-xs"
@@ -311,7 +312,48 @@ export default function ProjectEditor() {
 
         {activeTab === 'skills' && (
           <div className="space-y-4">
-            <label className="block text-sm font-medium">Associated Skills</label>
+            <div className="flex items-center justify-between">
+              <label className="block text-sm font-medium">Associated Skills</label>
+              <div className="flex gap-2">
+                <Input
+                  placeholder="New skill name..."
+                  className="h-8 w-48 text-xs"
+                  id="new-skill-input"
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 text-xs"
+                  onClick={async () => {
+                    const input = document.getElementById('new-skill-input') as HTMLInputElement;
+                    const name = input.value.trim();
+                    if (!name) return;
+
+                    try {
+                      const res = await fetch('/api/configuration/skills', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name, category: 'tool', level: 3, isFeatured: false }),
+                      });
+                      const result = await res.json();
+                      if (result.ok) {
+                        const newSkill = result.data;
+                        setSkillsList(prev => [...prev, newSkill]);
+                        setValue('skillIds', [...getValues('skillIds'), newSkill.id]);
+                        input.value = '';
+                        toast.success(`Skill "${name}" added`);
+                      } else {
+                        toast.error(result.error?.message || 'Failed to add skill');
+                      }
+                    } catch (err) {
+                      toast.error('An unexpected error occurred');
+                    }
+                  }}
+                >
+                  Add New
+                </Button>
+              </div>
+            </div>
             <div className="flex flex-wrap gap-2 p-3 border border-slate-300 dark:border-slate-600 rounded-md bg-slate-50 dark:bg-slate-900">
               {skillsList.map(s => (
                 <label key={s.id} className="flex items-center gap-2 px-2 py-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-xs cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700">
@@ -356,16 +398,39 @@ export default function ProjectEditor() {
               <Button
                 variant="outline"
                 className="aspect-video border-dashed flex flex-col items-center justify-center gap-2"
-                onClick={() => {
-                  const url = prompt('Enter image URL:');
-                  if (url) {
-                    const current = getValues('gallery') || [];
-                    setValue('gallery', [...current, url]);
-                  }
+                onClick={async () => {
+                  const input = document.createElement('input');
+                  input.type = 'file';
+                  input.accept = 'image/*';
+                  input.onchange = async (e) => {
+                    const file = (e.target as HTMLInputElement).files?.[0];
+                    if (!file) return;
+
+                    try {
+                      const formData = new FormData();
+                      formData.append('file', file);
+
+                      const res = await fetch('/api/configuration/upload', {
+                        method: 'POST',
+                        body: formData,
+                      });
+                      const result = await res.json();
+                      if (result.ok) {
+                        const current = getValues('gallery') || [];
+                        setValue('gallery', [...current, result.data.url]);
+                        toast.success('Image uploaded');
+                      } else {
+                        toast.error(result.error || 'Upload failed');
+                      }
+                    } catch (err) {
+                      toast.error('An unexpected error occurred');
+                    }
+                  };
+                  input.click();
                 }}
               >
                 <ImageIcon className="w-6 h-6 text-slate-400" />
-                <span className="text-xs">Add Image</span>
+                <span className="text-xs">Upload Image</span>
               </Button>
             </div>
           </div>
