@@ -9,126 +9,70 @@ import { Contact } from '@/components/public/Contact';
 import { ThemeToggle } from '@/components/theme-toggle';
 
 export default async function PortfolioPage() {
-  // Fetch all data server-side for best performance (RSC)
   const [profile, skills, experiences, projects, testimonials, contacts] = await Promise.all([
     prisma.profile.findFirst(),
     prisma.skill.findMany({ orderBy: { sortOrder: 'asc' } }),
-    prisma.experience.findMany({
-      include: { skills: { include: { skill: true } } },
-      orderBy: { sortOrder: 'asc' },
-    }),
+    prisma.experience.findMany({ include: { skills: { include: { skill: true } } }, orderBy: { sortOrder: 'asc' } }),
     prisma.project.findMany({
       where: { status: 'published' },
-      include: {
-        skills: { include: { skill: true } },
-        links: { orderBy: { sortOrder: 'asc' } },
-        facts: { orderBy: { sortOrder: 'asc' } },
-      },
+      include: { skills: { include: { skill: true } }, links: { orderBy: { sortOrder: 'asc' } }, facts: { orderBy: { sortOrder: 'asc' } } },
       orderBy: { sortOrder: 'asc' },
     }),
-    prisma.testimonial.findMany({
-      where: { isApproved: true, isFeatured: true },
-      orderBy: { sortOrder: 'asc' },
-    }),
-    prisma.contactChannel.findMany({
-      where: { isPublic: true },
-      orderBy: { sortOrder: 'asc' },
-    }),
+    prisma.testimonial.findMany({ where: { isApproved: true, isFeatured: true }, orderBy: { sortOrder: 'asc' } }),
+    prisma.contactChannel.findMany({ where: { isPublic: true }, orderBy: { sortOrder: 'asc' } }),
   ]);
 
   if (!profile) {
-    return <div className="p-20 text-center">Profile not found. Please seed the database.</div>;
+    return <div className="grid min-h-screen place-items-center bg-[#07111f] p-8 text-center text-white">Profile not found. Please seed the database.</div>;
   }
 
-  // Transform data for components
-  const formattedSkills = skills.map(s => ({
-    name: s.name,
-    category: s.category,
-    level: s.level,
+  const formattedSkills = skills.map((skill) => ({ name: skill.name, category: skill.category, level: skill.level }));
+  const formattedExperiences = experiences.map((experience) => ({
+    role: experience.role, company: experience.company, companyUrl: experience.companyUrl ?? undefined,
+    employmentType: experience.employmentType ?? undefined, location: experience.location ?? undefined,
+    startDate: experience.startDate.toISOString(), endDate: experience.endDate?.toISOString() ?? undefined,
+    description: experience.description, highlights: (experience.highlights as string[] | null) ?? undefined,
+    skills: experience.skills.map((item) => ({ skill: { name: item.skill.name } })),
   }));
-
-  const formattedExperiences = experiences.map(e => ({
-    role: e.role,
-    company: e.company,
-    companyUrl: e.companyUrl ?? undefined,
-    employmentType: e.employmentType ?? undefined,
-    location: e.location ?? undefined,
-    startDate: e.startDate.toISOString(),
-    endDate: e.endDate?.toISOString() ?? undefined,
-    description: e.description,
-    highlights: (e.highlights as string[] | null) ?? undefined,
-    skills: e.skills.map(s => ({ skill: { name: s.skill.name } })),
+  const formattedProjects = projects.map((project) => ({
+    id: project.id, slug: project.slug, title: project.title, summary: project.summary,
+    coverImageUrl: project.coverImageUrl ?? undefined, status: project.status, isFeatured: project.isFeatured,
+    skills: project.skills.map((item) => ({ skill: { name: item.skill.name } })),
+    links: project.links.map((link) => ({ kind: link.kind, label: link.label, url: link.url, isPrimary: link.isPrimary })),
   }));
-
-  const formattedProjects = projects.map(p => ({
-    id: p.id,
-    slug: p.slug,
-    title: p.title,
-    summary: p.summary,
-    coverImageUrl: p.coverImageUrl ?? undefined,
-    status: p.status,
-    isFeatured: p.isFeatured,
-    skills: p.skills.map(s => ({ skill: { name: s.skill.name } })),
-    links: p.links.map(l => ({
-      kind: l.kind,
-      label: l.label,
-      url: l.url,
-      isPrimary: l.isPrimary,
-    })),
+  const formattedTestimonials = testimonials.map((testimonial) => ({
+    authorName: testimonial.authorName, authorRole: testimonial.authorRole, authorCompany: testimonial.authorCompany,
+    authorAvatarUrl: testimonial.authorAvatarUrl, quote: testimonial.quote, rating: testimonial.rating, sourceUrl: testimonial.sourceUrl,
   }));
-
-  const formattedTestimonials = testimonials.map(t => ({
-    authorName: t.authorName,
-    authorRole: t.authorRole,
-    authorCompany: t.authorCompany,
-    authorAvatarUrl: t.authorAvatarUrl,
-    quote: t.quote,
-    rating: t.rating,
-    sourceUrl: t.sourceUrl,
-  }));
-
-  const formattedContacts = contacts.map(c => ({
-    id: c.id,
-    kind: c.kind,
-    label: c.label,
-    value: null, // revealed via client-side API
-  }));
-
+  const formattedContacts = contacts.map((contact) => ({ id: contact.id, kind: contact.kind, label: contact.label, value: null }));
   const publicSocials = contacts
-    .filter(c => c.kind !== 'email' && c.kind !== 'phone')
-    .map(c => ({
-      kind: c.kind,
-      url: 'https://github.com', // This is a placeholder; actual URL would be decrypted or handled
-      iconKey: c.iconKey ?? undefined,
-    }));
+    .filter((contact) => contact.kind !== 'email' && contact.kind !== 'phone')
+    .map((contact) => ({ kind: contact.kind, url: 'https://github.com', iconKey: contact.iconKey ?? undefined }));
+  const funFacts = Array.isArray(profile.funFacts) ? (profile.funFacts as string[]) : [];
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 selection:bg-blue-500/30">
-      <header className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-6 py-4 backdrop-blur-md bg-white/70 dark:bg-slate-900/70 border-b border-slate-200 dark:border-slate-800">
-        <div className="font-bold text-xl tracking-tighter">
-          {profile.fullName}
-        </div>
+    <div className="portfolio-shell min-h-screen overflow-hidden bg-[#07111f] text-[#ecf4ff] selection:bg-cyan-300 selection:text-[#07111f]">
+      <div className="portfolio-grid pointer-events-none fixed inset-0 z-0 opacity-40" />
+      <div className="pointer-events-none fixed -left-52 top-0 z-0 h-[38rem] w-[38rem] rounded-full bg-blue-500/20 blur-[150px]" />
+      <div className="pointer-events-none fixed -right-52 top-[32rem] z-0 h-[32rem] w-[32rem] rounded-full bg-violet-500/15 blur-[140px]" />
+
+      <header className="fixed inset-x-0 top-0 z-50 mx-auto flex h-24 max-w-[90rem] items-center justify-between px-5 md:px-10">
+        <a href="#top" className="group flex items-center gap-2 text-sm font-bold tracking-[-0.04em] text-white" aria-label="Back to top">
+          <span className="grid h-9 w-9 place-items-center rounded-full border border-white/20 bg-white/10 text-cyan-200 transition-transform duration-300 group-hover:rotate-12">✦</span>
+          <span className="hidden sm:block">{profile.fullName}</span>
+        </a>
+        <nav aria-label="Primary navigation" className="hidden items-center gap-6 rounded-full border border-white/10 bg-[#0c1a2d]/70 px-6 py-3 text-xs font-medium text-slate-300 backdrop-blur-xl lg:flex">
+          <a className="transition-colors hover:text-cyan-200" href="#about">About</a>
+          <a className="transition-colors hover:text-cyan-200" href="#skills">Expertise</a>
+          <a className="transition-colors hover:text-cyan-200" href="#work">Selected work</a>
+          <a className="transition-colors hover:text-cyan-200" href="#contact">Contact</a>
+        </nav>
         <ThemeToggle />
       </header>
 
-      <main className="pt-16">
-        <Hero
-          profile={{
-            fullName: profile.fullName,
-            headline: profile.headline,
-            tagline: profile.tagline ?? undefined,
-            avatarUrl: profile.avatarUrl ?? undefined,
-            availability: profile.availability ?? undefined,
-            resumeUrl: profile.resumeUrl ?? undefined,
-          }}
-          socials={publicSocials}
-        />
-        <About
-          profile={{
-            bio: profile.bio,
-            funFacts: profile.funFacts ? JSON.parse(profile.funFacts) : [],
-          }}
-        />
+      <main id="top" className="relative z-10">
+        <Hero profile={{ fullName: profile.fullName, headline: profile.headline, tagline: profile.tagline ?? undefined, avatarUrl: profile.avatarUrl ?? undefined, availability: profile.availability ?? undefined, resumeUrl: profile.resumeUrl ?? undefined }} socials={publicSocials} />
+        <About profile={{ bio: profile.bio, funFacts }} />
         <Skills skills={formattedSkills} />
         <Experience experiences={formattedExperiences} />
         <Projects projects={formattedProjects} />
@@ -136,9 +80,10 @@ export default async function PortfolioPage() {
         <Contact channels={formattedContacts} />
       </main>
 
-      <footer className="py-12 border-t border-slate-200 dark:border-slate-800 text-center text-sm text-slate-500">
-        <p>© {new Date().getFullYear()} {profile.fullName}. Built with Next.js 15.</p>
-      </footer >
+      <footer className="relative z-10 mx-auto flex max-w-[90rem] flex-col gap-4 border-t border-white/10 px-5 py-8 text-xs text-slate-400 sm:flex-row sm:items-center sm:justify-between md:px-10">
+        <p>© {new Date().getFullYear()} {profile.fullName}. Built with care and Next.js.</p>
+        <a href="#top" className="font-medium text-cyan-200 transition-colors hover:text-white">Back to top ↑</a>
+      </footer>
     </div>
   );
 }
