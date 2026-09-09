@@ -135,7 +135,7 @@ export default function ContactsPage() {
             <div className="space-y-2">
               <label className="block text-sm font-medium">Kind</label>
               <select
-                className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-transparent text-sm"
+                className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm"
                 value={newC.kind}
                 onChange={e => setNewC({ ...newC, kind: e.target.value })}
               >
