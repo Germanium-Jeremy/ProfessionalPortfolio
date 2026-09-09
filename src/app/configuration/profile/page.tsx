@@ -15,10 +15,14 @@ export default function ProfilePage() {
     register,
     handleSubmit,
     setValue,
+    watch,
     formState: { errors },
   } = useForm<ProfileInput>({
     resolver: zodResolver(profileSchema),
   });
+
+  const legalNameValue = watch('legalName');
+  const privateNotesValue = watch('privateNotes');
 
   useEffect(() => {
     async function loadProfile() {
@@ -132,12 +136,12 @@ export default function ProfilePage() {
           <h2 className="text-lg font-semibold">Private Information</h2>
           <SecretField
             label="Legal Name"
-            value={undefined}
+            value={legalNameValue}
             onChange={(val) => setValue('legalName', val)}
           />
           <SecretField
             label="Private Notes"
-            value={undefined}
+            value={privateNotesValue}
             onChange={(val) => setValue('privateNotes', val)}
           />
         </div>
