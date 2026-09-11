@@ -1,0 +1,215 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String     @id @default(cuid())
+  email        String     @unique
+  passwordHash String
+  name         String?
+  lastLoginAt  DateTime?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  auditLogs    AuditLog[]
+
+  @@map("users")
+}
+
+model Profile {
+  id                     String   @id @default(cuid())
+  fullName               String
+  headline               String
+  tagline                String?
+  bio                    String // markdown
+  avatarUrl              String?
+  location               String?
+  availability           String?
+  resumeUrl              String?
+  funFacts               String? // JSON string array for SQLite
+  // encrypted
+  legalNameCiphertext    Bytes?
+  legalNameIv            Bytes?
+  legalNameTag           Bytes?
+  privateNotesCiphertext Bytes?
+  privateNotesIv         Bytes?
+  privateNotesTag        Bytes?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  @@map("profiles")
+}
+
+model ContactChannel {
+  id              String   @id @default(cuid())
+  kind            String
+  label           String
+  iconKey         String?
+  isPublic        Boolean  @default(false)
+  sortOrder       Int      @default(0)
+  // encrypted value
+  valueCiphertext Bytes
+  valueIv         Bytes
+  valueTag        Bytes
+  valueBlindIndex String? // HMAC, for dedupe/lookup only
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([valueBlindIndex])
+  @@map("contact_channels")
+}
+
+model Skill {
+  id          String            @id @default(cuid())
+  name        String            @unique
+  category    String
+  level       Int               @default(3)
+  iconKey     String?
+  sortOrder   Int               @default(0)
+  isFeatured  Boolean           @default(false)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  experiences ExperienceSkill[]
+  projects    ProjectSkill[]
+
+  @@map("skills")
+}
+
+model Experience {
+  id             String            @id @default(cuid())
+  role           String
+  company        String
+  companyUrl     String?
+  employmentType String?
+  location       String?
+  startDate      DateTime
+  endDate        DateTime? // null = current
+  description    String // markdown
+  highlights     String? // JSON string array for SQLite
+  sortOrder      Int               @default(0)
+  isVisible      Boolean           @default(true)
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  skills         ExperienceSkill[]
+
+  @@map("experiences")
+}
+
+model ExperienceSkill {
+  experienceId String
+  skillId      String
+  experience   Experience @relation(fields: [experienceId], references: [id], onDelete: Cascade)
+  skill        Skill      @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@id([experienceId, skillId])
+  @@map("experience_skills")
+}
+
+model Project {
+  id            String         @id @default(cuid())
+  slug          String         @unique
+  title         String
+  summary       String
+  description   String? // markdown
+  coverImageUrl String?
+  gallery       String? // JSON string array for SQLite
+  startDate     DateTime?
+  endDate       DateTime?
+  status        String         @default("draft")
+  isFeatured    Boolean        @default(false)
+  sortOrder     Int            @default(0)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  links         ProjectLink[]
+  facts         ProjectFact[]
+  skills        ProjectSkill[]
+
+  @@map("projects")
+}
+
+model ProjectLink {
+  id        String   @id @default(cuid())
+  projectId String
+  kind      String
+  label     String
+  url       String
+  isPrimary Boolean  @default(false)
+  isPublic  Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("project_links")
+}
+
+model ProjectFact {
+  id        String  @id @default(cuid())
+  projectId String
+  label     String
+  value     String
+  sortOrder Int     @default(0)
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("project_facts")
+}
+
+model ProjectSkill {
+  projectId String
+  skillId   String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  skill     Skill   @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@id([projectId, skillId])
+  @@map("project_skills")
+}
+
+model Testimonial {
+  id                    String   @id @default(cuid())
+  authorName            String
+  authorRole            String?
+  authorCompany         String?
+  authorAvatarUrl       String?
+  quote                 String
+  rating                Int? // 1..5
+  sourceUrl             String?
+  isApproved            Boolean  @default(false)
+  isFeatured            Boolean  @default(false)
+  sortOrder             Int      @default(0)
+  // encrypted
+  authorEmailCiphertext Bytes?
+  authorEmailIv         Bytes?
+  authorEmailTag        Bytes?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@map("testimonials")
+}
+
+model SiteSetting {
+  key       String   @id
+  value     String // JSON string for SQLite
+  updatedAt DateTime @updatedAt
+
+  @@map("site_settings")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  action    String
+  entity    String
+  entityId  String?
+  diff      String? // JSON string for SQLite
+  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([entity, entityId])
+  @@map("audit_logs")
+}
