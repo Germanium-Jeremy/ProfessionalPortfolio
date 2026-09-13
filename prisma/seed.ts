@@ -81,9 +81,7 @@ async function main() {
       description: 'Leading the development of core platform features.',
       highlights: JSON.stringify(['Reduced latency by 40%', 'Mentored 5 junior devs']),
       skills: {
-        connect: skills.filter(s => ['TypeScript', 'React', 'PostgreSQL'].includes(s.name)).map(s => ({
-          experienceId_skillId: { experienceId: 'exp-1', skillId: s.id }
-        }))
+        create: skills.filter(s => ['TypeScript', 'React', 'PostgreSQL'].includes(s.name)).map(s => ({ skillId: s.id }))
       }
     }
   });
@@ -102,9 +100,7 @@ async function main() {
       description: 'Developed multiple indie titles for PC and Console.',
       highlights: JSON.stringify(['Shipped 3 titles on Steam', 'Implemented custom physics engine']),
       skills: {
-        connect: skills.filter(s => ['C#', 'Unity'].includes(s.name)).map(s => ({
-          experienceId_skillId: { experienceId: 'exp-2', skillId: s.id }
-        }))
+        create: skills.filter(s => ['C#', 'Unity'].includes(s.name)).map(s => ({ skillId: s.id }))
       }
     }
   });
@@ -123,9 +119,7 @@ async function main() {
       description: 'Built responsive websites for various clients.',
       highlights: JSON.stringify(['Learned modern CSS techniques', 'Integrated 3rd party APIs']),
       skills: {
-        connect: skills.filter(s => ['CSS', 'Git'].includes(s.name)).map(s => ({
-          experienceId_skillId: { experienceId: 'exp-3', skillId: s.id }
-        }))
+        create: skills.filter(s => ['CSS', 'Git'].includes(s.name)).map(s => ({ skillId: s.id }))
       }
     }
   });
@@ -148,9 +142,7 @@ async function main() {
         ]
       },
       skills: {
-        connect: skills.filter(s => ['TypeScript', 'Next.js', 'PostgreSQL'].includes(s.name)).map(s => ({
-          projectId_skillId: { projectId: 'seed-project-1', skillId: s.id }
-        }))
+        create: skills.filter(s => ['TypeScript', 'Next.js', 'PostgreSQL'].includes(s.name)).map(s => ({ skillId: s.id }))
       }
     }
   });
@@ -170,9 +162,7 @@ async function main() {
         ]
       },
       skills: {
-        connect: skills.filter(s => ['TypeScript', 'Zod'].includes(s.name)).map(s => ({
-          projectId_skillId: { projectId: 'seed-project-2', skillId: s.id }
-        }))
+        create: skills.filter(s => ['TypeScript', 'Zod'].includes(s.name)).map(s => ({ skillId: s.id }))
       }
     }
   });
@@ -199,9 +189,7 @@ async function main() {
         ]
       },
       skills: {
-        connect: skills.filter(s => ['C#', 'Unity'].includes(s.name)).map(s => ({
-          projectId_skillId: { projectId: 'seed-project-3', skillId: s.id }
-        }))
+        create: skills.filter(s => ['C#', 'Unity'].includes(s.name)).map(s => ({ skillId: s.id }))
       }
     }
   });
@@ -217,9 +205,7 @@ async function main() {
       status: 'published',
       // No links
       skills: {
-        connect: skills.filter(s => ['TypeScript', 'Docker'].includes(s.name)).map(s => ({
-          projectId_skillId: { projectId: 'seed-project-4', skillId: s.id }
-        }))
+        create: skills.filter(s => ['TypeScript', 'Docker'].includes(s.name)).map(s => ({ skillId: s.id }))
       }
     }
   });
