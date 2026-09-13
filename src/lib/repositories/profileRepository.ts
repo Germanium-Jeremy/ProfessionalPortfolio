@@ -1,13 +1,17 @@
-import { prisma } from '../db';
-import { encrypt, decrypt } from '../crypto';
+import { prisma } from "../db";
+import { encrypt, decrypt } from "../crypto";
 
 // Helper to decrypt a field if it exists
-function decryptField(ciphertext: Uint8Array | null, iv: Uint8Array | null, tag: Uint8Array | null): string | null {
+function decryptField(
+  ciphertext: Uint8Array | null,
+  iv: Uint8Array | null,
+  tag: Uint8Array | null,
+): string | null {
   if (!ciphertext || !iv || !tag) return null;
   try {
     return decrypt({ ciphertext, iv, tag });
   } catch (err) {
-    console.error('Failed to decrypt field', err);
+    console.error("Failed to decrypt field", err);
     return null;
   }
 }
@@ -18,8 +22,17 @@ export async function getAdminProfile() {
 
   return {
     ...profile,
-    legalName: decryptField(profile.legalNameCiphertext, profile.legalNameIv, profile.legalNameTag),
-    privateNotes: decryptField(profile.privateNotesCiphertext, profile.privateNotesIv, profile.privateNotesTag),
+    funFacts: profile.funFacts ? JSON.parse(profile.funFacts) : [],
+    legalName: decryptField(
+      profile.legalNameCiphertext,
+      profile.legalNameIv,
+      profile.legalNameTag,
+    ),
+    privateNotes: decryptField(
+      profile.privateNotesCiphertext,
+      profile.privateNotesIv,
+      profile.privateNotesTag,
+    ),
   };
 }
 
@@ -56,7 +69,7 @@ export async function updateProfile(data: {
   privateNotes?: string | null;
 }) {
   const existing = await prisma.profile.findFirst();
-  
+
   const legalNameEnc = data.legalName ? encrypt(data.legalName) : null;
   const privateNotesEnc = data.privateNotes ? encrypt(data.privateNotes) : null;
 
@@ -70,12 +83,16 @@ export async function updateProfile(data: {
     availability: data.availability,
     resumeUrl: data.resumeUrl,
     funFacts: data.funFacts ? JSON.stringify(data.funFacts) : null,
-    
-    legalNameCiphertext: legalNameEnc ? Buffer.from(legalNameEnc.ciphertext) : null,
+
+    legalNameCiphertext: legalNameEnc
+      ? Buffer.from(legalNameEnc.ciphertext)
+      : null,
     legalNameIv: legalNameEnc ? Buffer.from(legalNameEnc.iv) : null,
     legalNameTag: legalNameEnc ? Buffer.from(legalNameEnc.tag) : null,
-    
-    privateNotesCiphertext: privateNotesEnc ? Buffer.from(privateNotesEnc.ciphertext) : null,
+
+    privateNotesCiphertext: privateNotesEnc
+      ? Buffer.from(privateNotesEnc.ciphertext)
+      : null,
     privateNotesIv: privateNotesEnc ? Buffer.from(privateNotesEnc.iv) : null,
     privateNotesTag: privateNotesEnc ? Buffer.from(privateNotesEnc.tag) : null,
   };
