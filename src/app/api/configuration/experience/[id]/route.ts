@@ -5,12 +5,12 @@ import { experienceSchema } from '@/lib/validation/experience';
 import { revalidatePath } from 'next/cache';
 
 export async function PATCH(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await requireSession();
-    const body = await request.json();
+    const body = await _request.json();
     const { id } = await params;
 
     const result = experienceSchema.partial().safeParse(body);
@@ -40,21 +40,22 @@ export async function PATCH(
           deleteMany: {},
           create: skillIds.map(skillId => ({ skillId }))
         } : undefined
-      } as any,
+      },
     });
 
     revalidatePath('/configuration/experience');
     return NextResponse.json({ ok: true, data: { success: true } });
-  } catch (err: any) {
-    if (err.message === 'Unauthenticated') {
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    if (message === 'Unauthenticated') {
       return NextResponse.json({ ok: false, error: { code: 'UNAUTHENTICATED', message: 'Unauthorized access' } }, { status: 401 });
     }
-    return NextResponse.json({ ok: false, error: { code: 'INTERNAL_ERROR', message: err.message } }, { status: 500 });
+    return NextResponse.json({ ok: false, error: { code: 'INTERNAL_ERROR', message } }, { status: 500 });
   }
 }
 
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -67,10 +68,11 @@ export async function DELETE(
 
     revalidatePath('/configuration/experience');
     return NextResponse.json({ ok: true, data: { success: true } });
-  } catch (err: any) {
-    if (err.message === 'Unauthenticated') {
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    if (message === 'Unauthenticated') {
       return NextResponse.json({ ok: false, error: { code: 'UNAUTHENTICATED', message: 'Unauthorized access' } }, { status: 401 });
     }
-    return NextResponse.json({ ok: false, error: { code: 'INTERNAL_ERROR', message: err.message } }, { status: 500 });
+    return NextResponse.json({ ok: false, error: { code: 'INTERNAL_ERROR', message } }, { status: 500 });
   }
 }

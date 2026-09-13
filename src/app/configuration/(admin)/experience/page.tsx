@@ -22,7 +22,17 @@ export default function ExperiencePage() {
   const [skills, setSkills] = useState<{ id: string; name: string }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [newExp, setNewExp] = useState({
+    role: '',
+    company: '',
+    startDate: '',
+    endDate: '',
+    description: '',
+    skillIds: [] as string[],
+  });
+  const [editExp, setEditExp] = useState({
+    id: '',
     role: '',
     company: '',
     startDate: '',
@@ -45,10 +55,45 @@ export default function ExperiencePage() {
       const skillData = await skillRes.json();
       if (expData.ok) setExperiences(expData.data);
       if (skillData.ok) setSkills(skillData.data);
-    } catch (err) {
+    } catch {
       toast.error('Failed to load data');
     } finally {
       setIsLoading(false);
+    }
+  }
+
+  async function handleEditExperience(e: Experience) {
+    const skillIds = e.skills.map(s => s.skill.id);
+    setEditExp({
+      id: e.id,
+      role: e.role,
+      company: e.company,
+      startDate: e.startDate,
+      endDate: e.endDate || '',
+      description: e.description,
+      skillIds,
+    });
+    setIsEditing(true);
+    setIsAdding(false);
+  }
+
+  async function handleUpdateExperience() {
+    try {
+      const res = await fetch(`/api/configuration/experience/${editExp.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editExp),
+      });
+      const result = await res.json();
+      if (result.ok) {
+        toast.success('Experience updated');
+        setIsEditing(false);
+        loadData();
+      } else {
+        toast.error(result.error?.message || 'Failed to update experience');
+      }
+    } catch {
+      toast.error('An unexpected error occurred');
     }
   }
 
@@ -68,7 +113,7 @@ export default function ExperiencePage() {
       } else {
         toast.error(result.error?.message || 'Failed to add experience');
       }
-    } catch (err) {
+    } catch {
       toast.error('An unexpected error occurred');
     }
   }
@@ -81,7 +126,7 @@ export default function ExperiencePage() {
         toast.success('Experience deleted');
         loadData();
       }
-    } catch (err) {
+    } catch {
       toast.error('Failed to delete experience');
     }
   }
@@ -106,7 +151,12 @@ export default function ExperiencePage() {
       header: 'Actions',
       accessor: (e) => (
         <div className="flex gap-2">
-          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 w-8 p-0"
+            onClick={() => handleEditExperience(e)}
+          >
             <Pencil className="w-4 h-4" />
           </Button>
           <Button
@@ -211,7 +261,7 @@ export default function ExperiencePage() {
                       } else {
                         toast.error(result.error?.message || 'Failed to add skill');
                       }
-                    } catch (err) {
+                    } catch {
                       toast.error('An unexpected error occurred');
                     }
                   }}
@@ -242,6 +292,119 @@ export default function ExperiencePage() {
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={() => setIsAdding(false)}>Cancel</Button>
             <Button onClick={handleAddExperience}>Save Experience</Button>
+          </div>
+        </div>
+      )}
+
+      {isEditing && (
+        <div className="p-4 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">Role</label>
+              <Input
+                value={editExp.role}
+                onChange={e => setEditExp({ ...editExp, role: e.target.value })}
+                placeholder="e.g. Senior Software Engineer"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">Company</label>
+              <Input
+                value={editExp.company}
+                onChange={e => setEditExp({ ...editExp, company: e.target.value })}
+                placeholder="e.g. Tech Corp"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">Start Date</label>
+              <Input
+                type="date"
+                value={editExp.startDate}
+                onChange={e => setEditExp({ ...editExp, startDate: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">End Date (Optional)</label>
+              <Input
+                type="date"
+                value={editExp.endDate}
+                onChange={e => setEditExp({ ...editExp, endDate: e.target.value })}
+              />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <label className="block text-sm font-medium">Description (Markdown)</label>
+            <textarea
+              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-transparent min-h-[100px]"
+              value={editExp.description}
+              onChange={e => setEditExp({ ...editExp, description: e.target.value })}
+            />
+          </div>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="block text-sm font-medium">Skills</label>
+              <div className="flex gap-2">
+                <Input
+                  placeholder="New skill name..."
+                  className="h-8 w-48 text-xs"
+                  id="edit-exp-new-skill-input"
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 text-xs"
+                  onClick={async () => {
+                    const input = document.getElementById('edit-exp-new-skill-input') as HTMLInputElement;
+                    const name = input.value.trim();
+                    if (!name) return;
+
+                    try {
+                      const res = await fetch('/api/configuration/skills', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name, category: 'tool', level: 3, isFeatured: false }),
+                      });
+                      const result = await res.json();
+                      if (result.ok) {
+                        const newSkill = result.data;
+                        setSkills(prev => [...prev, newSkill]);
+                        setEditExp(prev => ({ ...prev, skillIds: [...prev.skillIds, newSkill.id] }));
+                        input.value = '';
+                        toast.success(`Skill "${name}" added`);
+                      } else {
+                        toast.error(result.error?.message || 'Failed to add skill');
+                      }
+                    } catch {
+                      toast.error('An unexpected error occurred');
+                    }
+                  }}
+                >
+                  Add New
+                </Button>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2 p-3 border border-slate-300 dark:border-slate-600 rounded-md bg-slate-50 dark:bg-slate-900">
+              {skills.map(s => (
+                <label key={s.id} className="flex items-center gap-2 px-2 py-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-xs cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700">
+                  <input
+                    type="checkbox"
+                    className="hidden"
+                    checked={editExp.skillIds.includes(s.id)}
+                    onChange={e => {
+                      const ids = e.target.checked
+                        ? [...editExp.skillIds, s.id]
+                        : editExp.skillIds.filter(id => id !== s.id);
+                      setEditExp({ ...editExp, skillIds: ids });
+                    }}
+                  />
+                  {s.name}
+                </label>
+              ))}
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setIsEditing(false)}>Cancel</Button>
+            <Button onClick={handleUpdateExperience}>Update Experience</Button>
           </div>
         </div>
       )}

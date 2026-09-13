@@ -21,10 +21,6 @@ export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    loadProjects();
-  }, []);
-
   async function loadProjects() {
     try {
       const res = await fetch('/api/configuration/projects');
@@ -32,7 +28,7 @@ export default function ProjectsPage() {
       if (result.ok) {
         setProjects(result.data);
       }
-    } catch (err) {
+    } catch {
       toast.error('Failed to load projects');
     } finally {
       setIsLoading(false);
@@ -47,10 +43,16 @@ export default function ProjectsPage() {
         toast.success('Project deleted');
         loadProjects();
       }
-    } catch (err) {
+    } catch {
       toast.error('Failed to delete project');
     }
   }
+
+  useEffect(() => {
+    setTimeout(() => {
+      loadProjects();
+    }, 0);
+  }, []);
 
   const columns: Column<Project>[] = [
     { header: 'Title', accessor: 'title', sortable: true },

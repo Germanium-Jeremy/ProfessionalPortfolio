@@ -26,10 +26,11 @@ export async function POST(
     });
 
     return NextResponse.json({ ok: true, data: { value } });
-  } catch (err: any) {
-    if (err.message === 'Unauthenticated') {
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    if (message === 'Unauthenticated') {
       return NextResponse.json({ ok: false, error: { code: 'UNAUTHENTICATED', message: 'Unauthorized access' } }, { status: 401 });
     }
-    return NextResponse.json({ ok: false, error: { code: 'INTERNAL_ERROR', message: err.message } }, { status: 500 });
+    return NextResponse.json({ ok: false, error: { code: 'INTERNAL_ERROR', message } }, { status: 500 });
   }
 }

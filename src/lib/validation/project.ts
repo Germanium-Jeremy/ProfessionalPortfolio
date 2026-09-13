@@ -13,6 +13,8 @@ export const projectSchema = z.object({
   isFeatured: z.boolean().default(false),
   sortOrder: z.number().int().default(0),
   skillIds: z.array(z.string()).optional(),
+  links: z.array(projectLinkSchema).optional(),
+  facts: z.array(projectFactSchema).optional(),
 }).strict();
 
 export const projectLinkSchema = z.object({

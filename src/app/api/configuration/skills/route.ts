@@ -11,11 +11,12 @@ export async function GET() {
       orderBy: { sortOrder: 'asc' },
     });
     return NextResponse.json({ ok: true, data: skills });
-  } catch (err: any) {
-    if (err.message === 'Unauthenticated') {
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    if (message === 'Unauthenticated') {
       return NextResponse.json({ ok: false, error: { code: 'UNAUTHENTICATED', message: 'Unauthorized access' } }, { status: 401 });
     }
-    return NextResponse.json({ ok: false, error: { code: 'INTERNAL_ERROR', message: err.message } }, { status: 500 });
+    return NextResponse.json({ ok: false, error: { code: 'INTERNAL_ERROR', message } }, { status: 500 });
   }
 }
 
@@ -42,13 +43,14 @@ export async function POST(request: NextRequest) {
 
     revalidatePath('/configuration/skills');
     return NextResponse.json({ ok: true, data: skill });
-  } catch (err: any) {
-    if (err.message === 'Unauthenticated') {
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    if (message === 'Unauthenticated') {
       return NextResponse.json({ ok: false, error: { code: 'UNAUTHENTICATED', message: 'Unauthorized access' } }, { status: 401 });
     }
-    if (err.code === 'P2002') {
+    if (err instanceof Error && (err as { code?: string }).code === 'P2002') {
       return NextResponse.json({ ok: false, error: { code: 'CONFLICT', message: 'Skill name already exists' } }, { status: 409 });
     }
-    return NextResponse.json({ ok: false, error: { code: 'INTERNAL_ERROR', message: err.message } }, { status: 500 });
+    return NextResponse.json({ ok: false, error: { code: 'INTERNAL_ERROR', message } }, { status: 500 });
   }
 }

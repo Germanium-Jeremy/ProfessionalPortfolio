@@ -43,7 +43,7 @@ export async function getSession() {
   try {
     const { payload } = await jwtVerify(sessionCookie, key);
     return payload;
-  } catch (err) {
+  } catch {
     return null;
   }
 }

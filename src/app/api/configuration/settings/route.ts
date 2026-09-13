@@ -30,18 +30,7 @@ export async function GET() {
     const settings: Record<string, unknown> = { ...DEFAULT_SETTINGS };
 
     for (const row of rows) {
-      let value = row.value;
-      if (typeof value === 'string') {
-        try {
-          // Attempt to parse if it looks like JSON
-          if ((value.startsWith('{') && value.endsWith('}')) || (value.startsWith('[') && value.endsWith(']'))) {
-            value = JSON.parse(value);
-          }
-        } catch (e) {
-          // Fallback to original string if parsing fails
-        }
-      }
-      settings[row.key] = value;
+      settings[row.key] = row.value;
     }
 
     return NextResponse.json({ ok: true, data: settings });
@@ -75,11 +64,10 @@ export async function PUT(request: NextRequest) {
 
     // Upsert each setting key individually
     const upserts = Object.entries(data).map(([key, value]) => {
-      const serializedValue = typeof value === 'object' ? JSON.stringify(value) : value;
       return prisma.siteSetting.upsert({
         where: { key },
-        update: { value: serializedValue as any },
-        create: { key, value: serializedValue as any },
+        update: { value },
+        create: { key, value },
       });
     });
 

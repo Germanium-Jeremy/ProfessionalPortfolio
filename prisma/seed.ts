@@ -67,7 +67,7 @@ async function main() {
   );
 
   // Seed Experience
-  const exp1 = await prisma.experience.upsert({
+  await prisma.experience.upsert({
     where: { id: 'exp-1' },
     update: {},
     create: {
@@ -86,7 +86,7 @@ async function main() {
     }
   });
 
-  const exp2 = await prisma.experience.upsert({
+  await prisma.experience.upsert({
     where: { id: 'exp-2' },
     update: {},
     create: {
@@ -105,7 +105,7 @@ async function main() {
     }
   });
 
-  const exp3 = await prisma.experience.upsert({
+  await prisma.experience.upsert({
     where: { id: 'exp-3' },
     update: {},
     create: {
@@ -125,7 +125,7 @@ async function main() {
   });
 
   // Seed Projects
-  const project1 = await prisma.project.upsert({
+  await prisma.project.upsert({
     where: { slug: 'e-commerce-platform' },
     update: {},
     create: {
@@ -147,7 +147,7 @@ async function main() {
     }
   });
 
-  const project2 = await prisma.project.upsert({
+  await prisma.project.upsert({
     where: { slug: 'open-source-lib' },
     update: {},
     create: {
@@ -167,7 +167,7 @@ async function main() {
     }
   });
 
-  const project3 = await prisma.project.upsert({
+  await prisma.project.upsert({
     where: { slug: 'unity-simulation' },
     update: {},
     create: {
@@ -194,7 +194,7 @@ async function main() {
     }
   });
 
-  const project4 = await prisma.project.upsert({
+  await prisma.project.upsert({
     where: { slug: 'secret-project' },
     update: {},
     create: {
@@ -203,7 +203,6 @@ async function main() {
       summary: 'Internal tool for a Fortune 500 company.',
       description: 'Detailed description hidden due to NDA.',
       status: 'published',
-      // No links
       skills: {
         create: skills.filter(s => ['TypeScript', 'Docker'].includes(s.name)).map(s => ({ skillId: s.id }))
       }
@@ -265,8 +264,8 @@ async function main() {
   // Seed Site Settings
   await prisma.siteSetting.upsert({
     where: { key: 'accent' },
-    update: { value: { color: '#3b82f6' } as any },
-    create: { key: 'accent', value: { color: '#3b82f6' } as any },
+    update: { value: { color: '#3b82f6' } },
+    create: { key: 'accent', value: { color: '#3b82f6' } },
   });
 
   console.log('Seeding completed successfully.');

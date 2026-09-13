@@ -23,7 +23,18 @@ export default function TestimonialsPage() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [newT, setNewT] = useState({
+    authorName: '',
+    authorRole: '',
+    authorCompany: '',
+    quote: '',
+    rating: 5,
+    isApproved: true,
+    isFeatured: false,
+  });
+  const [editT, setEditT] = useState({
+    id: '',
     authorName: '',
     authorRole: '',
     authorCompany: '',
@@ -44,10 +55,45 @@ export default function TestimonialsPage() {
       if (result.ok) {
         setTestimonials(result.data);
       }
-    } catch (err) {
+    } catch {
       toast.error('Failed to load testimonials');
     } finally {
       setIsLoading(false);
+    }
+  }
+
+  async function handleEditTestimonial(t: Testimonial) {
+    setEditT({
+      id: t.id,
+      authorName: t.authorName,
+      authorRole: t.authorRole || '',
+      authorCompany: t.authorCompany || '',
+      quote: t.quote,
+      rating: t.rating || 5,
+      isApproved: t.isApproved,
+      isFeatured: t.isFeatured,
+    });
+    setIsEditing(true);
+    setIsAdding(false);
+  }
+
+  async function handleUpdateTestimonial() {
+    try {
+      const res = await fetch(`/api/configuration/testimonials/${editT.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editT),
+      });
+      const result = await res.json();
+      if (result.ok) {
+        toast.success('Testimonial updated');
+        setIsEditing(false);
+        loadTestimonials();
+      } else {
+        toast.error(result.error?.message || 'Failed to update testimonial');
+      }
+    } catch {
+      toast.error('An unexpected error occurred');
     }
   }
 
@@ -67,7 +113,7 @@ export default function TestimonialsPage() {
       } else {
         toast.error(result.error?.message || 'Failed to add testimonial');
       }
-    } catch (err) {
+    } catch {
       toast.error('An unexpected error occurred');
     }
   }
@@ -83,7 +129,7 @@ export default function TestimonialsPage() {
         toast.success('Visibility updated');
         loadTestimonials();
       }
-    } catch (err) {
+    } catch {
       toast.error('Failed to update visibility');
     }
   }
@@ -96,7 +142,7 @@ export default function TestimonialsPage() {
         toast.success('Testimonial deleted');
         loadTestimonials();
       }
-    } catch (err) {
+    } catch {
       toast.error('Failed to delete testimonial');
     }
   }
@@ -125,7 +171,12 @@ export default function TestimonialsPage() {
       header: 'Actions',
       accessor: (t) => (
         <div className="flex gap-2">
-          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 w-8 p-0"
+            onClick={() => handleEditTestimonial(t)}
+          >
             <Pencil className="w-4 h-4" />
           </Button>
           <Button
@@ -211,6 +262,69 @@ export default function TestimonialsPage() {
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={() => setIsAdding(false)}>Cancel</Button>
             <Button onClick={handleAddTestimonial}>Save Testimonial</Button>
+          </div>
+        </div>
+      )}
+
+      {isEditing && (
+        <div className="p-4 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">Author Name</label>
+              <Input
+                value={editT.authorName}
+                onChange={e => setEditT({ ...editT, authorName: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">Role</label>
+              <Input
+                value={editT.authorRole}
+                onChange={e => setEditT({ ...editT, authorRole: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">Company</label>
+              <Input
+                value={editT.authorCompany}
+                onChange={e => setEditT({ ...editT, authorCompany: e.target.value })}
+              />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <label className="block text-sm font-medium">Quote</label>
+            <textarea
+              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-transparent min-h-[100px]"
+              value={editT.quote}
+              onChange={e => setEditT({ ...editT, quote: e.target.value })}
+            />
+          </div>
+          <div className="flex items-center gap-6">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">Rating (1-5)</label>
+              <Input
+                type="number"
+                min="1"
+                max="5"
+                value={editT.rating}
+                onChange={e => setEditT({ ...editT, rating: parseInt(e.target.value) })}
+                className="w-20"
+              />
+            </div>
+            <div className="flex items-center gap-4 pt-6">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" checked={editT.isApproved} onChange={e => setEditT({ ...editT, isApproved: e.target.checked })} />
+                <span className="text-sm font-medium">Approved</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" checked={editT.isFeatured} onChange={e => setEditT({ ...editT, isFeatured: e.target.checked })} />
+                <span className="text-sm font-medium">Show on Portfolio</span>
+              </label>
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setIsEditing(false)}>Cancel</Button>
+            <Button onClick={handleUpdateTestimonial}>Update Testimonial</Button>
           </div>
         </div>
       )}

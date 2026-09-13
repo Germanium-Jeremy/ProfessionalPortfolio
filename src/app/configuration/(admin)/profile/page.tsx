@@ -15,6 +15,7 @@ export default function ProfilePage() {
     register,
     handleSubmit,
     setValue,
+    setError,
     watch,
     formState: { errors },
   } = useForm<ProfileInput>({
@@ -43,7 +44,7 @@ export default function ProfilePage() {
           setValue('legalName', p.legalName ?? undefined);
           setValue('privateNotes', p.privateNotes ?? undefined);
         }
-      } catch (err) {
+      } catch {
         toast.error('Failed to load profile');
       } finally {
         setIsLoading(false);
@@ -63,9 +64,17 @@ export default function ProfilePage() {
       if (result.ok) {
         toast.success('Profile updated successfully');
       } else {
+        if (result.error?.code === 'VALIDATION_ERROR' && result.error.fields) {
+          Object.entries(result.error.fields).forEach(([field, messages]) => {
+            setError(field as keyof ProfileInput, {
+              type: 'server',
+              message: messages?.[0],
+            });
+          });
+        }
         toast.error(result.error?.message || 'Update failed');
       }
-    } catch (err) {
+    } catch {
       toast.error('An unexpected error occurred');
     }
   };

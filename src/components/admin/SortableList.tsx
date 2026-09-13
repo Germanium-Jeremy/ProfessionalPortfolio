@@ -5,11 +5,6 @@ import { cn } from '@/lib/utils';
 import { GripVertical, ArrowUp, ArrowDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-interface SortableItem<T> {
-  id: string;
-  content: React.ReactNode;
-}
-
 interface SortableListProps<T> {
   items: T[];
   renderItem: (item: T) => React.ReactNode;

@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { RepeatableField } from '@/components/admin/RepeatableField';
 import { toast } from 'sonner';
-import { ChevronLeft, Save, Link as LinkIcon, List, Tag, Image as ImageIcon, FileText, Trash2 } from 'lucide-react';
+import { ChevronLeft, Save, ImageIcon, Trash2 } from 'lucide-react';
 
 type Tab = 'basics' | 'description' | 'links' | 'facts' | 'skills' | 'gallery';
 
@@ -30,7 +30,7 @@ export default function ProjectEditor() {
     getValues,
     formState: { errors },
   } = useForm<ProjectInput & { links: ProjectLinkInput[]; facts: ProjectFactInput[]; skillIds: string[] }>({
-    resolver: zodResolver(projectSchema) as any,
+    resolver: zodResolver(projectSchema),
     defaultValues: {
       links: [],
       facts: [],
@@ -60,7 +60,7 @@ export default function ProjectEditor() {
             setValue('status', p.status);
             setValue('isFeatured', p.isFeatured);
             setValue('sortOrder', p.sortOrder);
-            setValue('links', p.links.map((l: any) => ({
+            setValue('links', p.links.map((l: { kind: string; label: string; url: string; isPrimary: boolean; isPublic: boolean; sortOrder: number }) => ({
               kind: l.kind,
               label: l.label,
               url: l.url,
@@ -68,15 +68,15 @@ export default function ProjectEditor() {
               isPublic: l.isPublic,
               sortOrder: l.sortOrder,
             })));
-            setValue('facts', p.facts.map((f: any) => ({
+            setValue('facts', p.facts.map((f: { label: string; value: string; sortOrder: number }) => ({
               label: f.label,
               value: f.value,
               sortOrder: f.sortOrder,
             })));
-            setValue('skillIds', p.skills.map((s: any) => s.skillId));
+            setValue('skillIds', p.skills.map((s: { skillId: string }) => s.skillId));
           }
         }
-      } catch (err) {
+      } catch {
         toast.error('Failed to load project data');
       } finally {
         setIsLoading(false);
@@ -85,16 +85,16 @@ export default function ProjectEditor() {
     loadData();
   }, [projectId, isNew, setValue]);
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: ProjectInput & { links: ProjectLinkInput[]; facts: ProjectFactInput[]; skillIds: string[] }) => {
     try {
-      const { links, facts, skillIds, ...projectData } = data;
+      const { skillIds, links, facts, ...projectData } = data;
       const method = isNew ? 'POST' : 'PATCH';
       const url = isNew ? '/api/configuration/projects' : `/api/configuration/projects/${projectId}`;
 
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...projectData, skillIds }),
+        body: JSON.stringify({ ...projectData, skillIds, links, facts }),
       });
 
       const result = await res.json();
@@ -102,8 +102,9 @@ export default function ProjectEditor() {
 
       toast.success('Project saved successfully');
       if (isNew) router.push(`/configuration/projects/${result.data.id}`);
-    } catch (err: any) {
-      toast.error(err.message);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'An unexpected error occurred';
+      toast.error(message);
     }
   };
 
@@ -113,7 +114,7 @@ export default function ProjectEditor() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="sm" onClick={() => router.back()}>
+          <Button variant="ghost" size="sm" type="button" onClick={() => router.back()}>
             <ChevronLeft className="w-4 h-4 mr-1" /> Back
           </Button>
           <h1 className="text-2xl font-bold">{isNew ? 'New Project' : 'Edit Project'}</h1>
@@ -321,6 +322,7 @@ export default function ProjectEditor() {
                   id="new-skill-input"
                 />
                 <Button
+                  type="button"
                   variant="outline"
                   size="sm"
                   className="h-8 text-xs"
@@ -345,7 +347,7 @@ export default function ProjectEditor() {
                       } else {
                         toast.error(result.error?.message || 'Failed to add skill');
                       }
-                    } catch (err) {
+                    } catch {
                       toast.error('An unexpected error occurred');
                     }
                   }}
@@ -396,6 +398,7 @@ export default function ProjectEditor() {
                 </div>
               ))}
               <Button
+                type="button"
                 variant="outline"
                 className="aspect-video border-dashed flex flex-col items-center justify-center gap-2"
                 onClick={async () => {
@@ -422,7 +425,7 @@ export default function ProjectEditor() {
                       } else {
                         toast.error(result.error || 'Upload failed');
                       }
-                    } catch (err) {
+                    } catch {
                       toast.error('An unexpected error occurred');
                     }
                   };

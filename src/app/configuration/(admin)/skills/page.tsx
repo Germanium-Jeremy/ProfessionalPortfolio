@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 
 interface Skill {
   id: string;
@@ -18,11 +17,18 @@ interface Skill {
 }
 
 export default function SkillsPage() {
-  const router = useRouter();
   const [skills, setSkills] = useState<Skill[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [newSkill, setNewSkill] = useState({
+    name: '',
+    category: 'language',
+    level: 3,
+    isFeatured: false,
+  });
+  const [editSkill, setEditSkill] = useState({
+    id: '',
     name: '',
     category: 'language',
     level: 3,
@@ -40,10 +46,42 @@ export default function SkillsPage() {
       if (result.ok) {
         setSkills(result.data);
       }
-    } catch (err) {
+    } catch {
       toast.error('Failed to load skills');
     } finally {
       setIsLoading(false);
+    }
+  }
+
+  async function handleEditSkill(s: Skill) {
+    setEditSkill({
+      id: s.id,
+      name: s.name,
+      category: s.category,
+      level: s.level,
+      isFeatured: s.isFeatured,
+    });
+    setIsEditing(true);
+    setIsAdding(false);
+  }
+
+  async function handleUpdateSkill() {
+    try {
+      const res = await fetch(`/api/configuration/skills/${editSkill.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editSkill),
+      });
+      const result = await res.json();
+      if (result.ok) {
+        toast.success('Skill updated');
+        setIsEditing(false);
+        loadSkills();
+      } else {
+        toast.error(result.error?.message || 'Failed to update skill');
+      }
+    } catch {
+      toast.error('An unexpected error occurred');
     }
   }
 
@@ -63,7 +101,7 @@ export default function SkillsPage() {
       } else {
         toast.error(result.error?.message || 'Failed to add skill');
       }
-    } catch (err) {
+    } catch {
       toast.error('An unexpected error occurred');
     }
   }
@@ -76,7 +114,7 @@ export default function SkillsPage() {
         toast.success('Skill deleted');
         loadSkills();
       }
-    } catch (err) {
+    } catch {
       toast.error('Failed to delete skill');
     }
   }
@@ -105,7 +143,12 @@ export default function SkillsPage() {
       header: 'Actions',
       accessor: (s) => (
         <div className="flex gap-2">
-          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 w-8 p-0"
+            onClick={() => handleEditSkill(s)}
+          >
             <Pencil className="w-4 h-4" />
           </Button>
           <Button
@@ -182,6 +225,60 @@ export default function SkillsPage() {
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={() => setIsAdding(false)}>Cancel</Button>
             <Button onClick={handleAddSkill}>Save Skill</Button>
+          </div>
+        </div>
+      )}
+
+      {isEditing && (
+        <div className="p-4 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">Name</label>
+              <Input
+                value={editSkill.name}
+                onChange={e => setEditSkill({ ...editSkill, name: e.target.value })}
+                placeholder="e.g. TypeScript"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">Category</label>
+              <select
+                className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm"
+                value={editSkill.category}
+                onChange={e => setEditSkill({ ...editSkill, category: e.target.value })}
+              >
+                <option value="language">Language</option>
+                <option value="framework">Framework</option>
+                <option value="tool">Tool</option>
+                <option value="devops">DevOps</option>
+                <option value="design">Design</option>
+                <option value="soft">Soft Skill</option>
+              </select>
+            </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">Level (1-5)</label>
+              <Input
+                type="number"
+                min="1"
+                max="5"
+                value={editSkill.level}
+                onChange={e => setEditSkill({ ...editSkill, level: parseInt(e.target.value) })}
+              />
+            </div>
+            <div className="flex items-center gap-2 py-8">
+              <input
+                type="checkbox"
+                id="edit-featured"
+                checked={editSkill.isFeatured}
+                onChange={e => setEditSkill({ ...editSkill, isFeatured: e.target.checked })}
+                className="w-4 h-4"
+              />
+              <label htmlFor="edit-featured" className="text-sm font-medium cursor-pointer">Featured</label>
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setIsEditing(false)}>Cancel</Button>
+            <Button onClick={handleUpdateSkill}>Update Skill</Button>
           </div>
         </div>
       )}

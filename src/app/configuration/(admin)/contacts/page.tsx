@@ -5,7 +5,7 @@ import { DataTable, type Column } from '@/components/admin/DataTable';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { Plus, Pencil, Trash2, Eye } from 'lucide-react';
+import { Plus, Pencil, Trash2 } from 'lucide-react';
 import { SecretField } from '@/components/admin/SecretField';
 
 interface Contact {
@@ -20,7 +20,15 @@ export default function ContactsPage() {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [newC, setNewC] = useState({
+    kind: 'email',
+    label: '',
+    isPublic: false,
+    value: '',
+  });
+  const [editC, setEditC] = useState({
+    id: '',
     kind: 'email',
     label: '',
     isPublic: false,
@@ -38,10 +46,43 @@ export default function ContactsPage() {
       if (result.ok) {
         setContacts(result.data);
       }
-    } catch (err) {
+    } catch {
       toast.error('Failed to load contacts');
     } finally {
       setIsLoading(false);
+    }
+  }
+
+  async function handleEditContact(c: Contact) {
+    try {
+      const res = await fetch(`/api/configuration/contacts/${c.id}/reveal`, { method: 'POST' });
+      const result = await res.json();
+      const value = result.ok ? result.data.value : '';
+      setEditC({ ...c, value });
+      setIsEditing(true);
+      setIsAdding(false);
+    } catch {
+      toast.error('Failed to load contact details');
+    }
+  }
+
+  async function handleUpdateContact() {
+    try {
+      const res = await fetch(`/api/configuration/contacts/${editC.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editC),
+      });
+      const result = await res.json();
+      if (result.ok) {
+        toast.success('Contact updated');
+        setIsEditing(false);
+        loadContacts();
+      } else {
+        toast.error(result.error?.message || 'Failed to update contact');
+      }
+    } catch {
+      toast.error('An unexpected error occurred');
     }
   }
 
@@ -61,7 +102,7 @@ export default function ContactsPage() {
       } else {
         toast.error(result.error?.message || 'Failed to add contact');
       }
-    } catch (err) {
+    } catch {
       toast.error('An unexpected error occurred');
     }
   }
@@ -74,7 +115,7 @@ export default function ContactsPage() {
         toast.success('Contact deleted');
         loadContacts();
       }
-    } catch (err) {
+    } catch {
       toast.error('Failed to delete contact');
     }
   }
@@ -102,7 +143,12 @@ export default function ContactsPage() {
       header: 'Actions',
       accessor: (c) => (
         <div className="flex gap-2">
-          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 w-8 p-0"
+            onClick={() => handleEditContact(c)}
+          >
             <Pencil className="w-4 h-4" />
           </Button>
           <Button
@@ -182,6 +228,63 @@ export default function ContactsPage() {
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={() => setIsAdding(false)}>Cancel</Button>
             <Button onClick={handleAddContact}>Save Contact</Button>
+          </div>
+        </div>
+      )}
+
+      {isEditing && (
+        <div className="p-4 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">Kind</label>
+              <select
+                className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm"
+                value={editC.kind}
+                onChange={e => setEditC({ ...editC, kind: e.target.value })}
+              >
+                <option value="email">Email</option>
+                <option value="phone">Phone</option>
+                <option value="whatsapp">WhatsApp</option>
+                <option value="linkedin">LinkedIn</option>
+                <option value="github">GitHub</option>
+                <option value="x">X</option>
+                <option value="discord">Discord</option>
+                <option value="website">Website</option>
+                <option value="youtube">YouTube</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">Label</label>
+              <Input
+                value={editC.label}
+                onChange={e => setEditC({ ...editC, label: e.target.value })}
+                placeholder="e.g. Work Email"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">Value</label>
+              <Input
+                value={editC.value}
+                onChange={e => setEditC({ ...editC, value: e.target.value })}
+                placeholder="e.g. jeremy@example.com"
+              />
+            </div>
+            <div className="flex items-center gap-4 py-6">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={editC.isPublic}
+                  onChange={e => setEditC({ ...editC, isPublic: e.target.checked })}
+                  className="w-4 h-4"
+                />
+                <span className="text-sm font-medium">Publicly Visible</span>
+              </label>
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setIsEditing(false)}>Cancel</Button>
+            <Button onClick={handleUpdateContact}>Update Contact</Button>
           </div>
         </div>
       )}

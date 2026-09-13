@@ -16,11 +16,12 @@ export async function GET() {
       orderBy: { sortOrder: 'asc' },
     });
     return NextResponse.json({ ok: true, data: projects });
-  } catch (err: any) {
-    if (err.message === 'Unauthenticated') {
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    if (message === 'Unauthenticated') {
       return NextResponse.json({ ok: false, error: { code: 'UNAUTHENTICATED', message: 'Unauthorized access' } }, { status: 401 });
     }
-    return NextResponse.json({ ok: false, error: { code: 'INTERNAL_ERROR', message: err.message } }, { status: 500 });
+    return NextResponse.json({ ok: false, error: { code: 'INTERNAL_ERROR', message } }, { status: 500 });
   }
 }
 
@@ -41,11 +42,12 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    const { skillIds, ...rawData } = result.data;
+    const { skillIds, links, facts, gallery, ...rawData } = result.data;
     const data = {
       ...rawData,
       startDate: rawData.startDate ? new Date(rawData.startDate) : null,
       endDate: rawData.endDate ? new Date(rawData.endDate) : null,
+      gallery: gallery ? JSON.stringify(gallery) : null,
     };
 
     const project = await prisma.project.create({
@@ -54,18 +56,25 @@ export async function POST(request: NextRequest) {
         skills: skillIds ? {
           create: skillIds.map(skillId => ({ skillId }))
         } : undefined,
-      } as any,
+        links: links ? {
+          create: links.map(l => ({ ...l }))
+        } : undefined,
+        facts: facts ? {
+          create: facts.map(f => ({ ...f }))
+        } : undefined,
+      },
     });
 
     revalidatePath('/configuration/projects');
     return NextResponse.json({ ok: true, data: project });
-  } catch (err: any) {
-    if (err.message === 'Unauthenticated') {
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    if (message === 'Unauthenticated') {
       return NextResponse.json({ ok: false, error: { code: 'UNAUTHENTICATED', message: 'Unauthorized access' } }, { status: 401 });
     }
-    if (err.code === 'P2002') {
+    if (err instanceof Error && (err as { code?: string }).code === 'P2002') {
       return NextResponse.json({ ok: false, error: { code: 'CONFLICT', message: 'Project slug already exists' } }, { status: 409 });
     }
-    return NextResponse.json({ ok: false, error: { code: 'INTERNAL_ERROR', message: err.message } }, { status: 500 });
+    return NextResponse.json({ ok: false, error: { code: 'INTERNAL_ERROR', message } }, { status: 500 });
   }
 }

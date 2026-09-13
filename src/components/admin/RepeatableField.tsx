@@ -26,7 +26,7 @@ export function RepeatableField<T>({
     <div className={cn("space-y-3", className)}>
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">{label}</h3>
-        <Button variant="outline" size="sm" onClick={onAdd} className="h-8 gap-1">
+        <Button type="button" variant="outline" size="sm" onClick={onAdd} className="h-8 gap-1">
           <Plus className="w-3 h-3" />
           Add
         </Button>
@@ -39,6 +39,7 @@ export function RepeatableField<T>({
               {renderItem(item, index)}
             </div>
             <Button
+              type="button"
               variant="ghost"
               size="sm"
               className="h-8 w-8 p-0 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"

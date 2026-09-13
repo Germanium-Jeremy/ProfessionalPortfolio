@@ -15,7 +15,7 @@ export async function getAdminTestimonials() {
           iv: t.authorEmailIv,
           tag: t.authorEmailTag,
         });
-      } catch (e) {
+      } catch {
         authorEmail = '*** DECRYPTION FAILED ***';
       }
     }

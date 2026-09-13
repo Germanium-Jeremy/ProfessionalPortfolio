@@ -5,7 +5,7 @@ import { projectSchema } from '@/lib/validation/project';
 import { revalidatePath } from 'next/cache';
 
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -26,11 +26,12 @@ export async function GET(
     }
 
     return NextResponse.json({ ok: true, data: project });
-  } catch (err: any) {
-    if (err.message === 'Unauthenticated') {
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    if (message === 'Unauthenticated') {
       return NextResponse.json({ ok: false, error: { code: 'UNAUTHENTICATED', message: 'Unauthorized access' } }, { status: 401 });
     }
-    return NextResponse.json({ ok: false, error: { code: 'INTERNAL_ERROR', message: err.message } }, { status: 500 });
+    return NextResponse.json({ ok: false, error: { code: 'INTERNAL_ERROR', message } }, { status: 500 });
   }
 }
 
@@ -53,12 +54,19 @@ export async function PATCH(
           fields: result.error.flatten().fieldErrors
         }
       }, { status: 400 });
-    }    const { skillIds, ...rawData } = result.data;
+    }
+    const { skillIds, links, facts, gallery, ...rawData } = result.data;
     const data = {
       ...rawData,
       ...(rawData.startDate !== undefined && rawData.startDate !== null ? { startDate: new Date(rawData.startDate) } : {}),
       ...(rawData.endDate !== undefined ? { endDate: rawData.endDate ? new Date(rawData.endDate) : null } : {}),
+      ...(gallery !== undefined ? { gallery: gallery ? JSON.stringify(gallery) : null } : {}),
     };
+
+    const oldProject = await prisma.project.findUnique({
+      where: { id },
+      select: { slug: true }
+    });
 
     await prisma.project.update({
       where: { id },
@@ -67,38 +75,59 @@ export async function PATCH(
         skills: skillIds ? {
           deleteMany: {},
           create: skillIds.map(skillId => ({ skillId }))
-        } : undefined
-      } as any,
+        } : undefined,
+        links: links ? {
+          deleteMany: {},
+          create: links.map(l => ({ ...l }))
+        } : undefined,
+        facts: facts ? {
+          deleteMany: {},
+          create: facts.map(f => ({ ...f }))
+        } : undefined,
+      },
     });
 
+    const newSlug = data.slug || oldProject?.slug;
     revalidatePath('/configuration/projects');
+    revalidatePath('/');
+    if (oldProject?.slug) revalidatePath(`/projects/${oldProject.slug}`);
+    if (newSlug) revalidatePath(`/projects/${newSlug}`);
     return NextResponse.json({ ok: true, data: { success: true } });
-  } catch (err: any) {
-    if (err.message === 'Unauthenticated') {
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    if (message === 'Unauthenticated') {
       return NextResponse.json({ ok: false, error: { code: 'UNAUTHENTICATED', message: 'Unauthorized access' } }, { status: 401 });
     }
-    return NextResponse.json({ ok: false, error: { code: 'INTERNAL_ERROR', message: err.message } }, { status: 500 });
+    return NextResponse.json({ ok: false, error: { code: 'INTERNAL_ERROR', message } }, { status: 500 });
   }
 }
 
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await requireSession();
     const { id } = await params;
 
+    const project = await prisma.project.findUnique({
+      where: { id },
+      select: { slug: true }
+    });
+
     await prisma.project.delete({
       where: { id },
     });
 
     revalidatePath('/configuration/projects');
+    revalidatePath('/');
+    if (project?.slug) revalidatePath(`/projects/${project.slug}`);
     return NextResponse.json({ ok: true, data: { success: true } });
-  } catch (err: any) {
-    if (err.message === 'Unauthenticated') {
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    if (message === 'Unauthenticated') {
       return NextResponse.json({ ok: false, error: { code: 'UNAUTHENTICATED', message: 'Unauthorized access' } }, { status: 401 });
     }
-    return NextResponse.json({ ok: false, error: { code: 'INTERNAL_ERROR', message: err.message } }, { status: 500 });
+    return NextResponse.json({ ok: false, error: { code: 'INTERNAL_ERROR', message } }, { status: 500 });
   }
 }

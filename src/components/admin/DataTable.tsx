@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { ChevronUp, ChevronDown, Search } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
 export interface Column<T> {

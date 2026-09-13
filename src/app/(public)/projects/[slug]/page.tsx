@@ -5,8 +5,7 @@ import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeSanitize from 'rehype-sanitize';
-import { ChevronLeft, ExternalLink, GitBranch, Layout } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { ChevronLeft, ExternalLink, Layout } from 'lucide-react';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -35,9 +34,6 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
 
   if (!project) notFound();
 
-  const primaryLink = project.links.find(l => l.isPrimary) ||
-                      project.links.find(l => l.kind === 'live') ||
-                      project.links.find(l => l.kind === 'github');
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100">

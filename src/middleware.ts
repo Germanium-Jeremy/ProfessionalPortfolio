@@ -17,7 +17,7 @@ export async function middleware(request: NextRequest) {
 
     try {
       await jwtVerify(sessionCookie, key);
-    } catch (err) {
+    } catch {
       return NextResponse.redirect(new URL(`/configuration/login?next=${encodeURIComponent(pathname)}`, request.url));
     }
   }

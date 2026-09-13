@@ -14,7 +14,7 @@ export async function getAdminContacts() {
         tag: contact.valueTag,
       });
       return { ...contact, value };
-    } catch (e) {
+    } catch {
       return { ...contact, value: '*** DECRYPTION FAILED ***' };
     }
   });
@@ -41,7 +41,7 @@ export async function getPublicContacts() {
         sortOrder: contact.sortOrder,
         value, // Revealed only for public channels
       };
-    } catch (e) {
+    } catch {
       return null;
     }
   }).filter(Boolean);
@@ -81,7 +81,7 @@ export async function updateContact(id: string, data: {
   value?: string;
   sortOrder?: number;
 }) {
-  const updateData: any = { ...data };
+  const updateData: Record<string, unknown> = { ...data };
 
   if (data.value !== undefined) {
     const encrypted = encrypt(data.value);
