@@ -15,7 +15,7 @@ export function Hero({ profile, socials }: HeroProps) {
       <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="relative z-10 order-2 lg:order-1">
         <div className="mb-7 flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-cyan-200"><span className="h-px w-9 bg-cyan-300" />Independent digital builder</div>
         <h1 className="max-w-3xl text-[clamp(3.25rem,8vw,7.5rem)] font-black leading-[0.88] tracking-[-0.075em] text-white">
-          {profile.fullName.split(' ').map((part, index) => <span className={index === 1 ? 'block text-transparent [-webkit-text-stroke:1px_rgb(165_243_252)]' : 'block'} key={`${part}-${index}`}>{part}</span>)}
+          {profile.fullName.split(' ').map((part, index) => <span className={index === 1 ? 'hero-outline-name block text-transparent [-webkit-text-stroke:1px_rgb(165_243_252)]' : 'block'} key={`${part}-${index}`}>{part}</span>)}
         </h1>
         <p className="mt-7 max-w-xl text-xl leading-relaxed text-slate-300 md:text-2xl">{profile.headline}</p>
         {profile.tagline && <p className="mt-4 max-w-lg text-sm leading-7 text-slate-400 md:text-base">{profile.tagline}</p>}

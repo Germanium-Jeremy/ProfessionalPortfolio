@@ -31,7 +31,7 @@ body {
 }
 
 .section-kicker {
-  color: rgb(165 243 252);
+  color: rgb(20, 138, 151);
   font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.2em;
@@ -78,6 +78,8 @@ html:not(.dark) .portfolio-shell .text-slate-400,
 html:not(.dark) .portfolio-shell .text-slate-500 { color: #60738b !important; }
 html:not(.dark) .portfolio-shell .text-cyan-200,
 html:not(.dark) .portfolio-shell .text-cyan-100 { color: #087a9b !important; }
+html:not(.dark) .portfolio-shell [class*='text-cyan-200'],
+html:not(.dark) .portfolio-shell [class*='text-cyan-100'] { color: #087a9b !important; }
 html:not(.dark) .portfolio-shell .border-white\/10,
 html:not(.dark) .portfolio-shell .border-white\/15,
 html:not(.dark) .portfolio-shell .border-white\/20 { border-color: rgba(25, 67, 105, 0.14) !important; }
@@ -91,6 +93,28 @@ html:not(.dark) .portfolio-shell .text-transparent { color: transparent !importa
 html:not(.dark) .portfolio-shell .shadow-black\/40 { --tw-shadow-color: rgba(25, 67, 105, 0.18) !important; }
 html:not(.dark) .portfolio-prose strong { color: #10233d; }
 html:not(.dark) .portfolio-prose a { color: #087a9b; }
+
+/* Strong, solid type gives the light layout the same hierarchy as dark mode. */
+html:not(.dark) .portfolio-shell h1,
+html:not(.dark) .portfolio-shell h2,
+html:not(.dark) .portfolio-shell h3 { color: #10233d !important; }
+html:not(.dark) .portfolio-shell .hero-outline-name {
+  color: #0b6683 !important;
+  -webkit-text-stroke: 0 !important;
+}
+
+html:not(.dark) .portfolio-shell .contact-panel {
+  background: radial-gradient(circle at 85% 12%, rgba(34, 211, 238, 0.22), transparent 30%), linear-gradient(125deg, #e7f6ff, #f9fcff) !important;
+  border-color: rgba(8, 122, 155, 0.28) !important;
+  box-shadow: 0 24px 60px rgba(37, 99, 145, 0.1);
+}
+html:not(.dark) .portfolio-shell .contact-channel {
+  background: rgba(255, 255, 255, 0.88) !important;
+  border-color: rgba(25, 67, 105, 0.14) !important;
+  box-shadow: 0 8px 20px rgba(37, 99, 145, 0.05);
+}
+html:not(.dark) .portfolio-shell .contact-panel .text-slate-300 { color: #36516f !important; }
+html:not(.dark) .portfolio-shell .contact-panel .text-slate-100 { color: #17314f !important; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
