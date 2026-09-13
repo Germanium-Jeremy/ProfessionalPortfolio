@@ -1,8 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { Prisma } from '@prisma/client';
 import { requireSession } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { experienceSchema } from '@/lib/validation/experience';
 import { revalidatePath } from 'next/cache';
+
+function experienceSkillCreates(skillIds: string[]) {
+  return skillIds.map((skillId) => ({
+    skill: { connect: { id: skillId } },
+  }));
+}
 
 export async function PATCH(
   _request: NextRequest,
@@ -25,22 +32,27 @@ export async function PATCH(
       }, { status: 400 });
     }
 
-    const { skillIds, startDate, endDate, ...rawData } = result.data;
-    const data = {
+    const { skillIds, startDate, endDate, highlights, ...rawData } = result.data;
+    const data: Prisma.ExperienceUpdateInput = {
       ...rawData,
       ...(startDate !== undefined && startDate !== null ? { startDate: new Date(startDate) } : {}),
       ...(endDate !== undefined ? { endDate: endDate ? new Date(endDate) : null } : {}),
+      ...(highlights !== undefined
+        ? { highlights: highlights ? JSON.stringify(highlights) : null }
+        : {}),
+      ...(skillIds
+        ? {
+            skills: {
+              deleteMany: {},
+              create: experienceSkillCreates(skillIds),
+            },
+          }
+        : {}),
     };
 
     await prisma.experience.update({
       where: { id },
-      data: {
-        ...data,
-        skills: skillIds ? {
-          deleteMany: {},
-          create: skillIds.map(skillId => ({ skillId }))
-        } : undefined
-      },
+      data,
     });
 
     revalidatePath('/configuration/experience');

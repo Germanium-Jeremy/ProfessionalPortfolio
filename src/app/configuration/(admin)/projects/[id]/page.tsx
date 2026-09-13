@@ -4,7 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { projectSchema, type ProjectInput, type ProjectLinkInput, type ProjectFactInput } from '@/lib/validation/project';
+import { z } from 'zod';
+import { projectSchema, type ProjectInput } from '@/lib/validation/project';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { RepeatableField } from '@/components/admin/RepeatableField';
@@ -12,6 +13,7 @@ import { toast } from 'sonner';
 import { ChevronLeft, Save, ImageIcon, Trash2 } from 'lucide-react';
 
 type Tab = 'basics' | 'description' | 'links' | 'facts' | 'skills' | 'gallery';
+type ProjectFormValues = z.input<typeof projectSchema>;
 
 export default function ProjectEditor() {
   const router = useRouter();
@@ -29,13 +31,20 @@ export default function ProjectEditor() {
     setValue,
     getValues,
     formState: { errors },
-  } = useForm<ProjectInput>({
+  } = useForm<ProjectFormValues, unknown, ProjectInput>({
     resolver: zodResolver(projectSchema),
     defaultValues: {
+      slug: '',
+      title: '',
+      summary: '',
+      status: 'draft',
+      isFeatured: false,
+      sortOrder: 0,
       links: [],
       facts: [],
       skillIds: [],
-    } as any,
+      gallery: [],
+    },
   });
 
   useEffect(() => {
@@ -85,9 +94,9 @@ export default function ProjectEditor() {
     loadData();
   }, [projectId, isNew, setValue]);
 
-  const onSubmit = async (data: ProjectInput & { links: ProjectLinkInput[]; facts: ProjectFactInput[]; skillIds: string[] }) => {
+  const onSubmit = async (data: ProjectInput) => {
     try {
-      const { skillIds, links, facts, ...projectData } = data;
+      const { skillIds = [], links = [], facts = [], ...projectData } = data;
       const method = isNew ? 'POST' : 'PATCH';
       const url = isNew ? '/api/configuration/projects' : `/api/configuration/projects/${projectId}`;
 
@@ -197,13 +206,13 @@ export default function ProjectEditor() {
         {activeTab === 'links' && (
           <RepeatableField
             label="Project Links"
-            items={getValues('links')}
+            items={getValues('links') ?? []}
             onAdd={() => {
-              const current = getValues('links');
+              const current = getValues('links') ?? [];
               setValue('links', [...current, { kind: 'other', label: '', url: '', isPrimary: false, isPublic: true, sortOrder: current.length }]);
             }}
             onRemove={(index) => {
-              const current = getValues('links');
+              const current = getValues('links') ?? [];
               setValue('links', current.filter((_, i) => i !== index));
             }}
             renderItem={(link, index) => (
@@ -213,8 +222,10 @@ export default function ProjectEditor() {
                   <select
                     value={link.kind}
                     onChange={e => {
-                      const current = [...getValues('links')];
-                      current[index] = { ...current[index], kind: e.target.value };
+                      const current = [...(getValues('links') ?? [])];
+                      const existing = current[index];
+                      if (!existing) return;
+                      current[index] = { ...existing, kind: e.target.value };
                       setValue('links', current);
                     }}
                     className="w-full px-2 py-1 border border-slate-300 dark:border-slate-600 rounded bg-transparent text-xs"
@@ -232,8 +243,10 @@ export default function ProjectEditor() {
                   <Input
                     value={link.label}
                     onChange={e => {
-                      const current = [...getValues('links')];
-                      current[index] = { ...current[index], label: e.target.value };
+                      const current = [...(getValues('links') ?? [])];
+                      const existing = current[index];
+                      if (!existing) return;
+                      current[index] = { ...existing, label: e.target.value };
                       setValue('links', current);
                     }}
                     className="h-8 text-xs"
@@ -244,8 +257,10 @@ export default function ProjectEditor() {
                   <Input
                     value={link.url}
                     onChange={e => {
-                      const current = [...getValues('links')];
-                      current[index] = { ...current[index], url: e.target.value };
+                      const current = [...(getValues('links') ?? [])];
+                      const existing = current[index];
+                      if (!existing) return;
+                      current[index] = { ...existing, url: e.target.value };
                       setValue('links', current);
                     }}
                     className="h-8 text-xs"
@@ -257,7 +272,7 @@ export default function ProjectEditor() {
                       type="checkbox"
                       checked={link.isPrimary}
                       onChange={e => {
-                        const current = getValues('links').map((l, i) => ({
+                        const current = (getValues('links') ?? []).map((l, i) => ({
                           ...l,
                           isPrimary: i === index ? e.target.checked : false
                         }));
@@ -275,13 +290,13 @@ export default function ProjectEditor() {
         {activeTab === 'facts' && (
           <RepeatableField
             label="Project Facts"
-            items={getValues('facts')}
+            items={getValues('facts') ?? []}
             onAdd={() => {
-              const current = getValues('facts');
+              const current = getValues('facts') ?? [];
               setValue('facts', [...current, { label: '', value: '', sortOrder: current.length }]);
             }}
             onRemove={(index) => {
-              const current = getValues('facts');
+              const current = getValues('facts') ?? [];
               setValue('facts', current.filter((_, i) => i !== index));
             }}
             renderItem={(fact, index) => (
@@ -290,8 +305,10 @@ export default function ProjectEditor() {
                   placeholder="Label (e.g. Team Size)"
                   value={fact.label}
                   onChange={e => {
-                    const current = [...getValues('facts')];
-                    current[index] = { ...current[index], label: e.target.value };
+                    const current = [...(getValues('facts') ?? [])];
+                    const existing = current[index];
+                    if (!existing) return;
+                    current[index] = { ...existing, label: e.target.value };
                     setValue('facts', current);
                   }}
                   className="h-8 text-xs"
@@ -300,8 +317,10 @@ export default function ProjectEditor() {
                   placeholder="Value (e.g. 4)"
                   value={fact.value}
                   onChange={e => {
-                    const current = [...getValues('facts')];
-                    current[index] = { ...current[index], value: e.target.value };
+                    const current = [...(getValues('facts') ?? [])];
+                    const existing = current[index];
+                    if (!existing) return;
+                    current[index] = { ...existing, value: e.target.value };
                     setValue('facts', current);
                   }}
                   className="h-8 text-xs"
@@ -341,7 +360,7 @@ export default function ProjectEditor() {
                       if (result.ok) {
                         const newSkill = result.data;
                         setSkillsList(prev => [...prev, newSkill]);
-                        setValue('skillIds', [...getValues('skillIds'), newSkill.id]);
+                        setValue('skillIds', [...(getValues('skillIds') ?? []), newSkill.id]);
                         input.value = '';
                         toast.success(`Skill "${name}" added`);
                       } else {
@@ -362,11 +381,11 @@ export default function ProjectEditor() {
                   <input
                     type="checkbox"
                     className="hidden"
-                    checked={getValues('skillIds').includes(s.id)}
+                    checked={(getValues('skillIds') ?? []).includes(s.id)}
                     onChange={e => {
                       const ids = e.target.checked
-                        ? [...getValues('skillIds'), s.id]
-                        : getValues('skillIds').filter(id => id !== s.id);
+                        ? [...(getValues('skillIds') ?? []), s.id]
+                        : (getValues('skillIds') ?? []).filter(id => id !== s.id);
                       setValue('skillIds', ids);
                     }}
                   />
