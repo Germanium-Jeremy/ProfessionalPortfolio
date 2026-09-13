@@ -42,11 +42,11 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    const { skillIds, ...rawData } = result.data;
+    const { skillIds, startDate, endDate, ...rawData } = result.data;
     const data = {
       ...rawData,
-      startDate: rawData.startDate ? new Date(rawData.startDate) : new Date(),
-      endDate: rawData.endDate ? new Date(rawData.endDate) : null,
+      startDate: startDate ? new Date(startDate) : new Date(),
+      endDate: endDate ? new Date(endDate) : null,
     };
 
     const experience = await prisma.experience.create({

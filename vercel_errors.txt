@@ -1,0 +1,23 @@
+src/app/api/configuration/experience/[id]/route.ts(37,7): error TS2322: Type '{ skills: { deleteMany: {}; create: { skillId: string; }[]; } | undefined; endDate?: string | Date | null | undefined; startDate?: string | Date | null | undefined; role?: string | undefined; ... 7 more ...; isVisible?: boolean | undefined; }' is not assignable to type '(Without<ExperienceUpdateInput, ExperienceUncheckedUpdateInput> & ExperienceUncheckedUpdateInput) | (Without<...> & ExperienceUpdateInput)'.
+
+src/app/api/configuration/experience/route.ts(53,7): error TS2322: Type '{ skills: { create: { skillId: string; }[]; } | undefined; startDate: Date; endDate: Date | null; role: string; company: string; description: string; sortOrder: number; isVisible: boolean; companyUrl?: string | ... 1 more ... | undefined; employmentType?: "Full-time" | ... 4 more ... | undefined; location?: string |...' is not assignable to type '(Without<ExperienceCreateInput, ExperienceUncheckedCreateInput> & ExperienceUncheckedCreateInput) | (Without<...> & ExperienceCreateInput)'.
+
+src/app/configuration/(admin)/profile/page.tsx(22,5): error TS2322: Type 'Resolver<{ fullName: string; headline: string; bio: string; tagline?: string | null | undefined; avatarUrl?: unknown; location?: string | null | undefined; availability?: string | null | undefined; resumeUrl?: unknown; funFacts?: string[] | ... 1 more ... | undefined; legalName?: string | ... 1 more ... | undefined;...' is not assignable to type 'Resolver<{ fullName: string; headline: string; bio: string; tagline?: string | null | undefined; avatarUrl?: string | null | undefined; location?: string | null | undefined; availability?: string | null | undefined; resumeUrl?: string | ... 1 more ... | undefined; funFacts?: string[] | ... 1 more ... | undefined; le...'.
+
+src/app/configuration/(admin)/profile/page.tsx(71,24): error TS7053: Element implicitly has an 'any' type because expression of type '0' can't be used to index type '{}'.
+
+src/app/configuration/(admin)/profile/page.tsx(93,36): error TS2345: Argument of type '(data: ProfileInput) => Promise<void>' is not assignable to parameter of type 'SubmitHandler<TFieldValues, Promise<void>>'.
+
+src/app/configuration/(admin)/projects/[id]/page.tsx(33,5): error TS2322: Type 'Resolver<{ slug: string; title: string; summary: string; description?: string | null | undefined; coverImageUrl?: string | null | undefined; gallery?: string[] | null | undefined; startDate?: string | null | undefined; ... 6 more ...; facts?: { ...; }[] | undefined; }, any, { ...; }>' is not assignable to type 'Resolver<{ slug: string; title: string; summary: string; status: "published" | "draft"; isFeatured: boolean; sortOrder: number; description?: string | null | undefined; coverImageUrl?: string | null | undefined; ... 5 more ...; facts?: { ...; }[] | undefined; } & { ...; }, any, { ...; } & { ...; }>'.
+
+src/app/configuration/(admin)/projects/[id]/page.tsx(122,39): error TS2345: Argument of type '(data: ProjectInput & { links: ProjectLinkInput[]; facts: ProjectFactInput[]; skillIds: string[]; }) => Promise<void>' is not assignable to parameter of type 'SubmitHandler<TFieldValues, Promise<void>>'.
+
+src/app/configuration/(admin)/projects/[id]/page.tsx(144,36): error TS2345: Argument of type '(data: ProjectInput & { links: ProjectLinkInput[]; facts: ProjectFactInput[]; skillIds: string[]; }) => Promise<void>' is not assignable to parameter of type 'SubmitHandler<TFieldValues, Promise<void>>'.
+
+src/lib/validation/project.ts(16,18): error TS2448: Block-scoped variable 'projectLinkSchema' used before its declaration.
+src/lib/validation/project.ts(16,18): error TS2454: Variable 'projectLinkSchema' is used before being assigned.
+src/lib/validation/project.ts(17,18): error TS2448: Block-scoped variable 'projectFactSchema' used before its declaration.
+src/lib/validation/project.ts(17,18): error TS2454: Variable 'projectFactSchema' is used before being assigned.
+
+ ELIFECYCLE  Command failed with exit code 1.
+Error: Command "pnpm run build" exited with 1

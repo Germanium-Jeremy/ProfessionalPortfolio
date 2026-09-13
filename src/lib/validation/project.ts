@@ -1,5 +1,20 @@
 import { z } from 'zod';
 
+export const projectLinkSchema = z.object({
+  kind: z.string().min(1).max(50),
+  label: z.string().min(1).max(100),
+  url: z.string().url(),
+  isPrimary: z.boolean().default(false),
+  isPublic: z.boolean().default(true),
+  sortOrder: z.number().int().default(0),
+}).strict();
+
+export const projectFactSchema = z.object({
+  label: z.string().min(1).max(100),
+  value: z.string().min(1).max(100),
+  sortOrder: z.number().int().default(0),
+}).strict();
+
 export const projectSchema = z.object({
   slug: z.string().min(1).max(100),
   title: z.string().min(1).max(200),
@@ -15,21 +30,6 @@ export const projectSchema = z.object({
   skillIds: z.array(z.string()).optional(),
   links: z.array(projectLinkSchema).optional(),
   facts: z.array(projectFactSchema).optional(),
-}).strict();
-
-export const projectLinkSchema = z.object({
-  kind: z.string().min(1).max(50),
-  label: z.string().min(1).max(100),
-  url: z.string().url(),
-  isPrimary: z.boolean().default(false),
-  isPublic: z.boolean().default(true),
-  sortOrder: z.number().int().default(0),
-}).strict();
-
-export const projectFactSchema = z.object({
-  label: z.string().min(1).max(100),
-  value: z.string().min(1).max(100),
-  sortOrder: z.number().int().default(0),
 }).strict();
 
 export type ProjectInput = z.infer<typeof projectSchema>;

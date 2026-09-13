@@ -25,11 +25,11 @@ export async function PATCH(
       }, { status: 400 });
     }
 
-    const { skillIds, ...rawData } = result.data;
+    const { skillIds, startDate, endDate, ...rawData } = result.data;
     const data = {
       ...rawData,
-      ...(rawData.startDate !== undefined && rawData.startDate !== null ? { startDate: new Date(rawData.startDate) } : {}),
-      ...(rawData.endDate !== undefined ? { endDate: rawData.endDate ? new Date(rawData.endDate) : null } : {}),
+      ...(startDate !== undefined && startDate !== null ? { startDate: new Date(startDate) } : {}),
+      ...(endDate !== undefined ? { endDate: endDate ? new Date(endDate) : null } : {}),
     };
 
     await prisma.experience.update({

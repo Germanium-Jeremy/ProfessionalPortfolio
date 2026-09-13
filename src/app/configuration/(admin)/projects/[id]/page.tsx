@@ -29,13 +29,13 @@ export default function ProjectEditor() {
     setValue,
     getValues,
     formState: { errors },
-  } = useForm<ProjectInput & { links: ProjectLinkInput[]; facts: ProjectFactInput[]; skillIds: string[] }>({
+  } = useForm<ProjectInput>({
     resolver: zodResolver(projectSchema),
     defaultValues: {
       links: [],
       facts: [],
       skillIds: [],
-    },
+    } as any,
   });
 
   useEffect(() => {

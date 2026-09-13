@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { profileSchema, type ProfileInput } from '@/lib/validation/profile';
 import { Button } from '@/components/ui/button';
@@ -19,7 +19,7 @@ export default function ProfilePage() {
     watch,
     formState: { errors },
   } = useForm<ProfileInput>({
-    resolver: zodResolver(profileSchema),
+    resolver: zodResolver(profileSchema) as any,
   });
 
   const legalNameValue = watch('legalName');
@@ -68,7 +68,7 @@ export default function ProfilePage() {
           Object.entries(result.error.fields).forEach(([field, messages]) => {
             setError(field as keyof ProfileInput, {
               type: 'server',
-              message: messages?.[0],
+              message: (messages as string[])?.[0],
             });
           });
         }
