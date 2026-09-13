@@ -11,6 +11,7 @@ import { toast } from "sonner";
 
 export default function ProfilePage() {
   const [isLoading, setIsLoading] = useState(true);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const {
     register,
     handleSubmit,
@@ -33,6 +34,37 @@ export default function ProfilePage() {
   const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     console.log("Profile form submit event received");
     void handleSubmit(onSubmit, onInvalid)(event);
+  };
+
+  const handleAvatarUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+
+    setIsUploadingAvatar(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/configuration/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const result = await res.json();
+      if (!res.ok || !result.ok || !result.data?.url) {
+        throw new Error(result.error || "Avatar upload failed");
+      }
+
+      setValue("avatarUrl", result.data.url, { shouldValidate: true });
+      toast.success("Avatar uploaded. Save your profile to apply it.");
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Avatar upload failed",
+      );
+    } finally {
+      setIsUploadingAvatar(false);
+    }
   };
 
   useEffect(() => {
@@ -155,6 +187,19 @@ export default function ProfilePage() {
           <div className="space-y-2">
             <label className="block text-sm font-medium">Avatar URL</label>
             <Input {...register("avatarUrl")} />
+            <label className="block text-xs text-slate-500">
+              Or upload an image
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleAvatarUpload}
+                disabled={isUploadingAvatar}
+                className="mt-1 block w-full text-sm"
+              />
+            </label>
+            {isUploadingAvatar && (
+              <p className="text-xs text-slate-500">Uploading avatar...</p>
+            )}
             {errors.avatarUrl && (
               <p className="text-xs text-red-500">{errors.avatarUrl.message}</p>
             )}
