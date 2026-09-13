@@ -8,6 +8,16 @@ import { Testimonials } from '@/components/public/Testimonials';
 import { Contact } from '@/components/public/Contact';
 import { ThemeToggle } from '@/components/theme-toggle';
 
+const parseJsonArray = (value: string | null): string[] | undefined => {
+  if (!value) return undefined;
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? (parsed as string[]) : undefined;
+  } catch {
+    return undefined;
+  }
+};
+
 export default async function PortfolioPage() {
   const [profile, skills, experiences, projects, testimonials, contacts] = await Promise.all([
     prisma.profile.findFirst(),
@@ -31,7 +41,7 @@ export default async function PortfolioPage() {
     role: experience.role, company: experience.company, companyUrl: experience.companyUrl ?? undefined,
     employmentType: experience.employmentType ?? undefined, location: experience.location ?? undefined,
     startDate: experience.startDate.toISOString(), endDate: experience.endDate?.toISOString() ?? undefined,
-    description: experience.description, highlights: (experience.highlights as string[] | null) ?? undefined,
+    description: experience.description, highlights: parseJsonArray(experience.highlights),
     skills: experience.skills.map((item) => ({ skill: { name: item.skill.name } })),
   }));
   const formattedProjects = projects.map((project) => ({
@@ -48,7 +58,7 @@ export default async function PortfolioPage() {
   const publicSocials = contacts
     .filter((contact) => contact.kind !== 'email' && contact.kind !== 'phone')
     .map((contact) => ({ kind: contact.kind, url: 'https://github.com', iconKey: contact.iconKey ?? undefined }));
-  const funFacts = Array.isArray(profile.funFacts) ? (profile.funFacts as string[]) : [];
+  const funFacts = parseJsonArray(profile.funFacts) ?? [];
 
   return (
     <div className="portfolio-shell min-h-screen overflow-hidden bg-[#07111f] text-[#ecf4ff] selection:bg-cyan-300 selection:text-[#07111f]">
