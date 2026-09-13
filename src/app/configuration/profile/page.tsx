@@ -40,8 +40,8 @@ export default function ProfilePage() {
           setValue('availability', p.availability);
           setValue('resumeUrl', p.resumeUrl);
           setValue('funFacts', p.funFacts);
-          setValue('legalName', p.legalName);
-          setValue('privateNotes', p.privateNotes);
+          setValue('legalName', p.legalName ?? undefined);
+          setValue('privateNotes', p.privateNotes ?? undefined);
         }
       } catch (err) {
         toast.error('Failed to load profile');

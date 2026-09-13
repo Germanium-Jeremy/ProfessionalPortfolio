@@ -8,8 +8,8 @@ import { Input } from '@/components/ui/input';
 
 interface SecretFieldProps {
   label: string;
-  value?: string; // The masked or decrypted value
-  defaultValue?: string;
+  value?: string | null; // The masked or decrypted value
+  defaultValue?: string | null;
   onChange?: (value: string) => void;
   onReveal?: () => Promise<string | null>;
   className?: string;

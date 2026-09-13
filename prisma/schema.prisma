@@ -30,7 +30,7 @@ model Profile {
   location               String?
   availability           String?
   resumeUrl              String?
-  funFacts               Json?
+  funFacts               String?
   // encrypted
   legalNameCiphertext    Bytes?
   legalNameIv            Bytes?
@@ -89,7 +89,7 @@ model Experience {
   startDate      DateTime
   endDate        DateTime? // null = current
   description    String // markdown
-  highlights     Json?
+  highlights     String?  // JSON string array
   sortOrder      Int               @default(0)
   isVisible      Boolean           @default(true)
   createdAt      DateTime          @default(now())
@@ -116,7 +116,7 @@ model Project {
   summary       String
   description   String? // markdown
   coverImageUrl String?
-  gallery       Json?
+  gallery       String?  // JSON string array
   startDate     DateTime?
   endDate       DateTime?
   status        String         @default("draft")
