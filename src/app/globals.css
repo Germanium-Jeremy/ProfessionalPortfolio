@@ -44,6 +44,54 @@ body {
 .portfolio-prose ul { margin-top: 1rem; padding-left: 1.2rem; }
 .portfolio-prose li::marker { color: rgb(103 232 249); }
 
+/* The public site is dark-first, but the toggle also needs a complete light
+   composition—not merely a white page behind dark surfaces. These rules are
+   deliberately scoped so the admin UI can keep using its Tailwind palette. */
+html:not(.dark) {
+  --background: #f5f8fc;
+  --foreground: #10233d;
+}
+
+html:not(.dark) .portfolio-shell {
+  background: #f5f8fc !important;
+  color: #10233d !important;
+}
+
+html:not(.dark) .portfolio-grid {
+  background-image: linear-gradient(rgba(15, 43, 78, 0.075) 1px, transparent 1px), linear-gradient(90deg, rgba(15, 43, 78, 0.075) 1px, transparent 1px);
+}
+
+html:not(.dark) .portfolio-shell [class*='bg-[#07111f]'] { background-color: #f5f8fc !important; }
+html:not(.dark) .portfolio-shell [class*='bg-[#0c1a2d]'] { background-color: rgba(255, 255, 255, 0.84) !important; }
+html:not(.dark) .portfolio-shell [class*='bg-[#0d2139]'] { background-color: #dcecfb !important; }
+html:not(.dark) .portfolio-shell [class*='bg-[#102440]'] { background-color: rgba(255, 255, 255, 0.94) !important; }
+html:not(.dark) .portfolio-shell [class*='bg-[#091323]'] { background-color: #eff7ff !important; }
+html:not(.dark) .portfolio-shell [class*='bg-white/[0.045]'],
+html:not(.dark) .portfolio-shell [class*='bg-black/'],
+html:not(.dark) .portfolio-shell [class*='bg-[#07111f]/'] { background-color: rgba(255, 255, 255, 0.74) !important; }
+
+html:not(.dark) .portfolio-shell .text-white { color: #10233d !important; }
+html:not(.dark) .portfolio-shell .text-slate-100 { color: #17314f !important; }
+html:not(.dark) .portfolio-shell .text-slate-200 { color: #29415c !important; }
+html:not(.dark) .portfolio-shell .text-slate-300 { color: #405875 !important; }
+html:not(.dark) .portfolio-shell .text-slate-400,
+html:not(.dark) .portfolio-shell .text-slate-500 { color: #60738b !important; }
+html:not(.dark) .portfolio-shell .text-cyan-200,
+html:not(.dark) .portfolio-shell .text-cyan-100 { color: #087a9b !important; }
+html:not(.dark) .portfolio-shell .border-white\/10,
+html:not(.dark) .portfolio-shell .border-white\/15,
+html:not(.dark) .portfolio-shell .border-white\/20 { border-color: rgba(25, 67, 105, 0.14) !important; }
+
+html:not(.dark) .portfolio-shell .bg-cyan-200 { background-color: #0e7490 !important; }
+html:not(.dark) .portfolio-shell .bg-cyan-200.text-\[\#07111f\] { color: white !important; }
+html:not(.dark) .portfolio-shell [class*='from-[#091323]'] { --tw-gradient-from: #e9f5ff !important; }
+html:not(.dark) .portfolio-shell [class*='to-transparent'] { --tw-gradient-to: transparent !important; }
+html:not(.dark) .portfolio-shell .mix-blend-luminosity { mix-blend-mode: normal; }
+html:not(.dark) .portfolio-shell .text-transparent { color: transparent !important; }
+html:not(.dark) .portfolio-shell .shadow-black\/40 { --tw-shadow-color: rgba(25, 67, 105, 0.18) !important; }
+html:not(.dark) .portfolio-prose strong { color: #10233d; }
+html:not(.dark) .portfolio-prose a { color: #087a9b; }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
