@@ -22,7 +22,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     <div className="flex h-screen bg-slate-50 dark:bg-slate-900">
       <aside className="w-64 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 flex flex-col">
         <div className="p-4 border-b border-slate-200 dark:border-slate-700">
-          <h1 className="text-xl font-bold">Admin CMS</h1>
+          <h1 className="text-xl font-bold text-slate-700">Admin CMS</h1>
           {profile && <p className="text-sm text-slate-500 mt-1">{profile.fullName}</p>}
         </div>
         
@@ -52,7 +52,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         </div>
       </aside>
       
-      <main className="flex-1 overflow-y-auto p-8">
+      <main className="flex-1 overflow-y-auto p-8 bg-slate-950">
         {children}
       </main>
     </div>
