@@ -18,7 +18,7 @@ interface HeroProps {
 
 export function Hero({ profile, socials }: HeroProps) {
   return (
-    <section className="mx-auto grid min-h-[48rem] max-w-[90rem] items-center gap-10 px-5 pb-16 pt-32 md:px-10 lg:grid-cols-[1.04fr_.96fr] lg:pb-24 lg:pt-28">
+    <section className="mx-auto grid min-h-192 max-w-360 items-center gap-10 px-5 pb-16 pt-32 md:px-10 lg:grid-cols-[1.04fr_.96fr] lg:pb-24 lg:pt-28">
       <motion.div
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
@@ -43,7 +43,7 @@ export function Hero({ profile, socials }: HeroProps) {
             </span>
           ))}
         </h1>
-        <p className="mt-7 max-w-xl break-words text-xl leading-relaxed text-slate-300 md:text-2xl">
+        <p className="mt-7 max-w-xl wrap-break-word text-xl leading-relaxed text-slate-300 md:text-2xl">
           {profile.headline}
         </p>
         {profile.tagline && (
@@ -100,10 +100,10 @@ export function Hero({ profile, socials }: HeroProps) {
         transition={{ duration: 0.8, delay: 0.1 }}
         className="relative order-1 mx-auto min-w-0 w-full max-w-xl lg:order-2"
       >
-        <div className="absolute -inset-6 rounded-[3rem] bg-gradient-to-br from-cyan-300/30 via-blue-600/15 to-violet-400/20 blur-2xl" />
-        <div className="relative aspect-[4/5] overflow-hidden rounded-[2.25rem] border border-white/15 bg-[#0d2139] shadow-2xl shadow-black/40">
+        <div className="absolute -inset-6 rounded-[3rem] bg-linear-to-br from-cyan-300/30 via-blue-600/15 to-violet-400/20 blur-2xl" />
+        <div className="relative aspect-4/5 overflow-hidden rounded-[2.25rem] border border-white/15 bg-[#0d2139] shadow-2xl shadow-black/40">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_20%,rgba(103,232,249,.5),transparent_22%),linear-gradient(145deg,#162f51_0%,#0b1626_62%)]" />
-          <div className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-[#07111f] via-[#07111f]/30 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-2/5 bg-linear-to-t from-[#07111f] via-[#07111f]/30 to-transparent" />
           {profile.avatarUrl ? (
             <Image
               src={profile.avatarUrl}
@@ -125,7 +125,7 @@ export function Hero({ profile, socials }: HeroProps) {
             <span className="max-w-40 text-xs leading-5 text-slate-300">
               Turning complex ideas into useful, memorable products.
             </span>
-            <span className="text-5xl font-black tracking-[-0.1em] text-white/80">
+            <span className="text-5xl font-black tracking-widest text-white/80">
               01
             </span>
           </div>

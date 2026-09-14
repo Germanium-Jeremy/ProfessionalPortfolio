@@ -24,7 +24,7 @@ export function Projects({ projects }: ProjectsProps) {
   return (
     <section
       id="work"
-      className="mx-auto max-w-[90rem] px-5 py-20 md:px-10 lg:py-32"
+      className="mx-auto max-w-360 px-5 py-20 md:px-10 lg:py-32"
     >
       <div className="mb-12 flex flex-col justify-between gap-5 md:flex-row md:items-end">
         <div>
@@ -47,10 +47,10 @@ export function Projects({ projects }: ProjectsProps) {
           return (
             <article
               key={project.id}
-              className={`group relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#0c1a2d] ${index === 0 ? "md:col-span-2" : ""}`}
+              className={`group relative overflow-hidden rounded-4xl border border-white/10 bg-[#0c1a2d] ${index === 0 ? "md:col-span-2" : ""}`}
             >
               <div
-                className={`relative overflow-hidden ${index === 0 ? "aspect-[16/7]" : "aspect-[4/3]"}`}
+                className={`relative overflow-hidden ${index === 0 ? "aspect-16/7" : "aspect-4/3"}`}
               >
                 {project.coverImageUrl ? (
                   <Image
@@ -66,7 +66,7 @@ export function Projects({ projects }: ProjectsProps) {
                     <Code2 className="absolute right-8 top-8 h-16 w-16 text-white/10" />
                   </div>
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#091323] via-[#091323]/30 to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-t from-[#091323] via-[#091323]/30 to-transparent" />
               </div>
               <div className="absolute inset-x-0 bottom-0 p-6 md:p-8">
                 <div className="mb-3 flex items-center justify-between">

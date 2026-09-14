@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { RepeatableField } from "@/components/admin/RepeatableField";
 import { toast } from "sonner";
 import { ChevronLeft, Save, ImageIcon, Trash2, X } from "lucide-react";
+import Image from "next/image";
 
 type Tab = "basics" | "description" | "links" | "facts" | "skills" | "gallery";
 type ProjectFormValues = z.input<typeof projectSchema>;
@@ -313,7 +314,7 @@ export default function ProjectEditor() {
             </label>
             <textarea
               {...register("description")}
-              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-transparent min-h-[300px]"
+              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-transparent min-h-75"
             />
             {errors.description && (
               <p className="text-xs text-red-500">
@@ -599,7 +600,7 @@ export default function ProjectEditor() {
                   key={index}
                   className="relative aspect-video bg-slate-100 dark:bg-slate-700 rounded-md overflow-hidden border border-slate-200 dark:border-slate-600"
                 >
-                  <img
+                  <Image
                     src={url}
                     alt="Gallery"
                     className="w-full h-full object-cover"

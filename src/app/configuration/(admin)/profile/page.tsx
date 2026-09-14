@@ -165,7 +165,7 @@ export default function ProfilePage() {
           <label className="block text-sm font-medium">Bio (Markdown)</label>
           <textarea
             {...register("bio")}
-            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-transparent min-h-[150px]"
+            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-transparent min-h-37.5"
           />
           {errors.bio && (
             <p className="text-xs text-red-500">{errors.bio.message}</p>

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Plus, Pencil, Trash2 } from "lucide-react";
+import Image from "next/image";
 
 interface Testimonial {
   id: string;
@@ -315,9 +316,11 @@ export default function TestimonialsPage() {
                 className="block w-full text-sm"
               />
               {newT.authorAvatarUrl && (
-                <img
+                <Image
                   src={newT.authorAvatarUrl}
                   alt="Profile preview"
+                  width={48}
+                  height={48}
                   className="h-12 w-12 rounded-full object-cover"
                 />
               )}
@@ -326,7 +329,7 @@ export default function TestimonialsPage() {
           <div className="space-y-2">
             <label className="block text-sm font-medium">Quote</label>
             <textarea
-              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-transparent min-h-[100px]"
+              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-transparent min-h-25"
               value={newT.quote}
               onChange={(e) => setNewT({ ...newT, quote: e.target.value })}
             />
@@ -432,9 +435,11 @@ export default function TestimonialsPage() {
                 className="block w-full text-sm"
               />
               {editT.authorAvatarUrl && (
-                <img
+                <Image
                   src={editT.authorAvatarUrl}
                   alt="Profile preview"
+                  width={48}
+                  height={48}
                   className="h-12 w-12 rounded-full object-cover"
                 />
               )}
@@ -443,7 +448,7 @@ export default function TestimonialsPage() {
           <div className="space-y-2">
             <label className="block text-sm font-medium">Quote</label>
             <textarea
-              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-transparent min-h-[100px]"
+              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-transparent min-h-25"
               value={editT.quote}
               onChange={(e) => setEditT({ ...editT, quote: e.target.value })}
             />

@@ -49,16 +49,16 @@ export function Contact({ channels }: ContactProps) {
   return (
     <section
       id="contact"
-      className="mx-auto max-w-[90rem] min-w-0 px-5 py-20 md:px-10 lg:py-32"
+      className="mx-auto max-w-360 min-w-0 px-5 py-20 md:px-10 lg:py-32"
     >
-      <div className="contact-panel relative min-w-0 overflow-hidden rounded-[2rem] border border-cyan-200/20 bg-[radial-gradient(circle_at_85%_12%,rgba(34,211,238,.2),transparent_24%),linear-gradient(125deg,#102d4b,#101936)] p-7 md:p-12">
+      <div className="contact-panel relative min-w-0 overflow-hidden rounded-4xl border border-cyan-200/20 bg-[radial-gradient(circle_at_85%_12%,rgba(34,211,238,.2),transparent_24%),linear-gradient(125deg,#102d4b,#101936)] p-7 md:p-12">
         <div className="absolute -bottom-24 -right-20 text-[16rem] font-black leading-none tracking-[-.15em] text-white/[.035]">
           Hi
         </div>
         <div className="relative grid min-w-0 gap-10 lg:grid-cols-[1fr_.8fr]">
           <div className="min-w-0">
             <p className="section-kicker text-cyan-100">07 / Contact</p>
-            <h2 className="mt-4 max-w-xl break-words text-4xl font-black tracking-[-0.07em] text-white md:text-6xl">
+            <h2 className="mt-4 max-w-xl wrap-break-word text-4xl font-black tracking-[-0.07em] text-white md:text-6xl">
               Let’s make the next thing memorable.
             </h2>
             <p className="mt-5 max-w-md text-sm leading-7 text-slate-300 md:text-base">
@@ -84,7 +84,7 @@ export function Contact({ channels }: ContactProps) {
                       <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-500">
                         {channel.label}
                       </p>
-                      <p className="break-words text-sm font-medium text-slate-100 [overflow-wrap:anywhere]">
+                      <p className="text-sm font-medium text-slate-100 wrap-anywhere">
                         {value ?? "••••••••••••"}
                       </p>
                     </div>

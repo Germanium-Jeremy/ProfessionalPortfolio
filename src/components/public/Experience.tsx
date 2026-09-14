@@ -3,6 +3,7 @@
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeSanitize from "rehype-sanitize";
+import Image from "next/image";
 
 interface ExperienceProps {
   experiences: {
@@ -29,7 +30,7 @@ export function Experience({ experiences }: ExperienceProps) {
   return (
     <section
       id="experience"
-      className="mx-auto max-w-[90rem] px-5 py-20 md:px-10 lg:py-32"
+      className="mx-auto max-w-360 px-5 py-20 md:px-10 lg:py-32"
     >
       <div className="mb-12">
         <p className="section-kicker">04 / Experience</p>
@@ -53,7 +54,7 @@ export function Experience({ experiences }: ExperienceProps) {
               <div className="flex items-center gap-3">
                 <div className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-lg border border-white/10 bg-white/5">
                   {experience.companyLogoUrl ? (
-                    <img
+                    <Image
                       src={experience.companyLogoUrl}
                       alt=""
                       className="h-full w-full object-contain p-1"

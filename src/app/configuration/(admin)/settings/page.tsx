@@ -136,7 +136,7 @@ export default function SettingsPage() {
         <div className="space-y-2">
           <label className="block text-sm font-medium">Site Description</label>
           <textarea
-            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-transparent min-h-[80px]"
+            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-transparent min-h-20"
             value={settings.seoDescription}
             onChange={(e) => setSettings({ ...settings, seoDescription: e.target.value })}
             placeholder="A short description for search engines"

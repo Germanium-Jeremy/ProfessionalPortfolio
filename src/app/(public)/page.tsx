@@ -121,10 +121,10 @@ export default async function PortfolioPage() {
   return (
     <div className="portfolio-shell min-h-screen overflow-hidden bg-[#07111f] text-[#ecf4ff] selection:bg-cyan-300 selection:text-[#07111f]">
       <div className="portfolio-grid pointer-events-none fixed inset-0 z-0 opacity-40" />
-      <div className="pointer-events-none fixed -left-52 top-0 z-0 h-[38rem] w-[38rem] rounded-full bg-blue-500/20 blur-[150px]" />
-      <div className="pointer-events-none fixed -right-52 top-[32rem] z-0 h-[32rem] w-[32rem] rounded-full bg-violet-500/15 blur-[140px]" />
+      <div className="pointer-events-none fixed -left-52 top-0 z-0 h-152 w-152 rounded-full bg-blue-500/20 blur-[150px]" />
+      <div className="pointer-events-none fixed -right-52 top-128 z-0 h-128 w-lg rounded-full bg-violet-500/15 blur-[140px]" />
 
-      <header className="fixed inset-x-0 top-0 z-50 mx-auto flex h-24 max-w-[90rem] items-center justify-between px-5 md:px-10">
+      <header className="fixed inset-x-0 top-0 z-50 mx-auto flex h-24 max-w-360 items-center justify-between px-5 md:px-10">
         <a
           href="#top"
           className="group flex items-center gap-2 text-sm font-bold tracking-[-0.04em] text-white"
@@ -175,7 +175,7 @@ export default async function PortfolioPage() {
         <Contact channels={formattedContacts} />
       </main>
 
-      <footer className="relative z-10 mx-auto flex max-w-[90rem] flex-col gap-4 border-t border-white/10 px-5 py-8 text-xs text-slate-400 sm:flex-row sm:items-center sm:justify-between md:px-10">
+      <footer className="relative z-10 mx-auto flex max-w-360 flex-col gap-4 border-t border-white/10 px-5 py-8 text-xs text-slate-400 sm:flex-row sm:items-center sm:justify-between md:px-10">
         <p>
           © {new Date().getFullYear()} {profile.fullName}. Built with care and
           Next.js.

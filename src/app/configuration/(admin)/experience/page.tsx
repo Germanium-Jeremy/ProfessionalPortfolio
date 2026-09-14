@@ -291,7 +291,7 @@ export default function ExperiencePage() {
               Description (Markdown)
             </label>
             <textarea
-              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-transparent min-h-[100px]"
+              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-transparent min-h-25"
               value={newExp.description}
               onChange={(e) =>
                 setNewExp({ ...newExp, description: e.target.value })
@@ -503,7 +503,7 @@ export default function ExperiencePage() {
               Description (Markdown)
             </label>
             <textarea
-              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-transparent min-h-[100px]"
+              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-transparent min-h-25"
               value={editExp.description}
               onChange={(e) =>
                 setEditExp({ ...editExp, description: e.target.value })
