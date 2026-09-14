@@ -86,11 +86,12 @@ export default function ExperiencePage() {
 
   async function handleUpdateExperience() {
     try {
-      const res = await fetch(`/api/configuration/experience/${editExp.id}`, {
+      const { id: experienceId, ...experienceData } = editExp;
+      const res = await fetch(`/api/configuration/experience/${experienceId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...editExp,
+          ...experienceData,
           endDate: editIsCurrent ? "" : editExp.endDate,
         }),
       });
