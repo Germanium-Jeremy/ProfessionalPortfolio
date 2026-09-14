@@ -1,17 +1,18 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState } from 'react';
-import { DataTable, type Column } from '@/components/admin/DataTable';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { toast } from 'sonner';
-import { Plus, Pencil, Trash2 } from 'lucide-react';
+import React, { useEffect, useState } from "react";
+import { DataTable, type Column } from "@/components/admin/DataTable";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
+import { Plus, Pencil, Trash2 } from "lucide-react";
 
 interface Testimonial {
   id: string;
   authorName: string;
   authorRole: string | null;
   authorCompany: string | null;
+  authorAvatarUrl: string | null;
   quote: string;
   rating: number | null;
   isApproved: boolean;
@@ -25,20 +26,22 @@ export default function TestimonialsPage() {
   const [isAdding, setIsAdding] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [newT, setNewT] = useState({
-    authorName: '',
-    authorRole: '',
-    authorCompany: '',
-    quote: '',
+    authorName: "",
+    authorRole: "",
+    authorCompany: "",
+    authorAvatarUrl: "",
+    quote: "",
     rating: 5,
     isApproved: true,
     isFeatured: false,
   });
   const [editT, setEditT] = useState({
-    id: '',
-    authorName: '',
-    authorRole: '',
-    authorCompany: '',
-    quote: '',
+    id: "",
+    authorName: "",
+    authorRole: "",
+    authorCompany: "",
+    authorAvatarUrl: "",
+    quote: "",
     rating: 5,
     isApproved: true,
     isFeatured: false,
@@ -50,15 +53,48 @@ export default function TestimonialsPage() {
 
   async function loadTestimonials() {
     try {
-      const res = await fetch('/api/configuration/testimonials');
+      const res = await fetch("/api/configuration/testimonials");
       const result = await res.json();
       if (result.ok) {
         setTestimonials(result.data);
       }
     } catch {
-      toast.error('Failed to load testimonials');
+      toast.error("Failed to load testimonials");
     } finally {
       setIsLoading(false);
+    }
+  }
+
+  async function handleAvatarUpload(
+    event: React.ChangeEvent<HTMLInputElement>,
+    target: "new" | "edit",
+  ) {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/configuration/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const result = await res.json();
+      if (!res.ok || !result.ok || !result.data?.url) {
+        throw new Error(result.error || "Image upload failed");
+      }
+
+      if (target === "new") {
+        setNewT((prev) => ({ ...prev, authorAvatarUrl: result.data.url }));
+      } else {
+        setEditT((prev) => ({ ...prev, authorAvatarUrl: result.data.url }));
+      }
+      toast.success("Profile image uploaded");
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Image upload failed",
+      );
     }
   }
 
@@ -66,8 +102,9 @@ export default function TestimonialsPage() {
     setEditT({
       id: t.id,
       authorName: t.authorName,
-      authorRole: t.authorRole || '',
-      authorCompany: t.authorCompany || '',
+      authorRole: t.authorRole || "",
+      authorCompany: t.authorCompany || "",
+      authorAvatarUrl: t.authorAvatarUrl || "",
       quote: t.quote,
       rating: t.rating || 5,
       isApproved: t.isApproved,
@@ -79,85 +116,105 @@ export default function TestimonialsPage() {
 
   async function handleUpdateTestimonial() {
     try {
-      const res = await fetch(`/api/configuration/testimonials/${editT.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(editT),
+      const { id, ...testimonialData } = editT;
+      const res = await fetch(`/api/configuration/testimonials/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(testimonialData),
       });
       const result = await res.json();
       if (result.ok) {
-        toast.success('Testimonial updated');
+        toast.success("Testimonial updated");
         setIsEditing(false);
         loadTestimonials();
       } else {
-        toast.error(result.error?.message || 'Failed to update testimonial');
+        toast.error(result.error?.message || "Failed to update testimonial");
       }
     } catch {
-      toast.error('An unexpected error occurred');
+      toast.error("An unexpected error occurred");
     }
   }
 
   async function handleAddTestimonial() {
     try {
-      const res = await fetch('/api/configuration/testimonials', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/configuration/testimonials", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newT),
       });
       const result = await res.json();
       if (result.ok) {
-        toast.success('Testimonial added');
-        setNewT({ authorName: '', authorRole: '', authorCompany: '', quote: '', rating: 5, isApproved: true, isFeatured: false });
+        toast.success("Testimonial added");
+        setNewT({
+          authorName: "",
+          authorRole: "",
+          authorCompany: "",
+          authorAvatarUrl: "",
+          quote: "",
+          rating: 5,
+          isApproved: true,
+          isFeatured: false,
+        });
         setIsAdding(false);
         loadTestimonials();
       } else {
-        toast.error(result.error?.message || 'Failed to add testimonial');
+        toast.error(result.error?.message || "Failed to add testimonial");
       }
     } catch {
-      toast.error('An unexpected error occurred');
+      toast.error("An unexpected error occurred");
     }
   }
 
   async function toggleFeatured(id: string, current: boolean) {
     try {
       const res = await fetch(`/api/configuration/testimonials/${id}/feature`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isFeatured: !current }),
       });
       if (res.ok) {
-        toast.success('Visibility updated');
+        toast.success("Visibility updated");
         loadTestimonials();
       }
     } catch {
-      toast.error('Failed to update visibility');
+      toast.error("Failed to update visibility");
     }
   }
 
   async function handleDeleteTestimonial(id: string) {
-    if (!confirm('Are you sure you want to delete this testimonial?')) return;
+    if (!confirm("Are you sure you want to delete this testimonial?")) return;
     try {
-      const res = await fetch(`/api/configuration/testimonials/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/configuration/testimonials/${id}`, {
+        method: "DELETE",
+      });
       if (res.ok) {
-        toast.success('Testimonial deleted');
+        toast.success("Testimonial deleted");
         loadTestimonials();
       }
     } catch {
-      toast.error('Failed to delete testimonial');
+      toast.error("Failed to delete testimonial");
     }
   }
 
   const columns: Column<Testimonial>[] = [
-    { header: 'Author', accessor: (t) => (
-      <div className="flex flex-col">
-        <span className="font-medium">{t.authorName}</span>
-        <span className="text-xs text-slate-500">{t.authorRole} @ {t.authorCompany}</span>
-      </div>
-    )},
-    { header: 'Rating', accessor: (t) => (t.rating ? `⭐ ${t.rating}/5` : 'N/A') },
-    { header: 'Approved', accessor: (t) => (t.isApproved ? '✅' : '❌') },
     {
-      header: 'Show on Portfolio',
+      header: "Author",
+      accessor: (t) => (
+        <div className="flex flex-col">
+          <span className="font-medium">{t.authorName}</span>
+          <span className="text-xs text-slate-500">
+            {t.authorRole} @ {t.authorCompany}
+          </span>
+        </div>
+      ),
+    },
+    {
+      header: "Rating",
+      accessor: (t) => (t.rating ? `⭐ ${t.rating}/5` : "N/A"),
+    },
+    { header: "Approved", accessor: (t) => (t.isApproved ? "✅" : "❌") },
+    {
+      header: "Show on Portfolio",
       accessor: (t) => (
         <input
           type="checkbox"
@@ -165,10 +222,10 @@ export default function TestimonialsPage() {
           checked={t.isFeatured}
           onChange={() => toggleFeatured(t.id, t.isFeatured)}
         />
-      )
+      ),
     },
     {
-      header: 'Actions',
+      header: "Actions",
       accessor: (t) => (
         <div className="flex gap-2">
           <Button
@@ -199,7 +256,13 @@ export default function TestimonialsPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Testimonials Management</h1>
         <Button onClick={() => setIsAdding(!isAdding)} className="gap-2">
-          {isAdding ? 'Cancel' : <><Plus className="w-4 h-4" /> Add Testimonial</>}
+          {isAdding ? (
+            "Cancel"
+          ) : (
+            <>
+              <Plus className="w-4 h-4" /> Add Testimonial
+            </>
+          )}
         </Button>
       </div>
 
@@ -210,22 +273,54 @@ export default function TestimonialsPage() {
               <label className="block text-sm font-medium">Author Name</label>
               <Input
                 value={newT.authorName}
-                onChange={e => setNewT({ ...newT, authorName: e.target.value })}
+                onChange={(e) =>
+                  setNewT({ ...newT, authorName: e.target.value })
+                }
               />
             </div>
             <div className="space-y-2">
               <label className="block text-sm font-medium">Role</label>
               <Input
                 value={newT.authorRole}
-                onChange={e => setNewT({ ...newT, authorRole: e.target.value })}
+                onChange={(e) =>
+                  setNewT({ ...newT, authorRole: e.target.value })
+                }
               />
             </div>
             <div className="space-y-2">
               <label className="block text-sm font-medium">Company</label>
               <Input
                 value={newT.authorCompany}
-                onChange={e => setNewT({ ...newT, authorCompany: e.target.value })}
+                onChange={(e) =>
+                  setNewT({ ...newT, authorCompany: e.target.value })
+                }
               />
+            </div>
+            <div className="space-y-2 md:col-span-3">
+              <label className="block text-sm font-medium">
+                Profile Image (Optional)
+              </label>
+              <Input
+                type="url"
+                value={newT.authorAvatarUrl}
+                onChange={(e) =>
+                  setNewT({ ...newT, authorAvatarUrl: e.target.value })
+                }
+                placeholder="https://..."
+              />
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleAvatarUpload(e, "new")}
+                className="block w-full text-sm"
+              />
+              {newT.authorAvatarUrl && (
+                <img
+                  src={newT.authorAvatarUrl}
+                  alt="Profile preview"
+                  className="h-12 w-12 rounded-full object-cover"
+                />
+              )}
             </div>
           </div>
           <div className="space-y-2">
@@ -233,7 +328,7 @@ export default function TestimonialsPage() {
             <textarea
               className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-transparent min-h-[100px]"
               value={newT.quote}
-              onChange={e => setNewT({ ...newT, quote: e.target.value })}
+              onChange={(e) => setNewT({ ...newT, quote: e.target.value })}
             />
           </div>
           <div className="flex items-center gap-6">
@@ -244,24 +339,46 @@ export default function TestimonialsPage() {
                 min="1"
                 max="5"
                 value={newT.rating}
-                onChange={e => setNewT({ ...newT, rating: parseInt(e.target.value) })}
+                onChange={(e) =>
+                  setNewT({ ...newT, rating: parseInt(e.target.value) })
+                }
                 className="w-20"
               />
             </div>
             <div className="flex items-center gap-4 pt-6">
               <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" checked={newT.isApproved} onChange={e => setNewT({ ...newT, isApproved: e.target.checked })} />
+                <input
+                  type="checkbox"
+                  checked={newT.isApproved}
+                  onChange={(e) =>
+                    setNewT({ ...newT, isApproved: e.target.checked })
+                  }
+                />
                 <span className="text-sm font-medium">Approved</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" checked={newT.isFeatured} onChange={e => setNewT({ ...newT, isFeatured: e.target.checked })} />
+                <input
+                  type="checkbox"
+                  checked={newT.isFeatured}
+                  onChange={(e) =>
+                    setNewT({ ...newT, isFeatured: e.target.checked })
+                  }
+                />
                 <span className="text-sm font-medium">Show on Portfolio</span>
               </label>
             </div>
           </div>
           <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setIsAdding(false)}>Cancel</Button>
-            <Button onClick={handleAddTestimonial}>Save Testimonial</Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsAdding(false)}
+            >
+              Cancel
+            </Button>
+            <Button type="button" onClick={handleAddTestimonial}>
+              Save Testimonial
+            </Button>
           </div>
         </div>
       )}
@@ -273,22 +390,54 @@ export default function TestimonialsPage() {
               <label className="block text-sm font-medium">Author Name</label>
               <Input
                 value={editT.authorName}
-                onChange={e => setEditT({ ...editT, authorName: e.target.value })}
+                onChange={(e) =>
+                  setEditT({ ...editT, authorName: e.target.value })
+                }
               />
             </div>
             <div className="space-y-2">
               <label className="block text-sm font-medium">Role</label>
               <Input
                 value={editT.authorRole}
-                onChange={e => setEditT({ ...editT, authorRole: e.target.value })}
+                onChange={(e) =>
+                  setEditT({ ...editT, authorRole: e.target.value })
+                }
               />
             </div>
             <div className="space-y-2">
               <label className="block text-sm font-medium">Company</label>
               <Input
                 value={editT.authorCompany}
-                onChange={e => setEditT({ ...editT, authorCompany: e.target.value })}
+                onChange={(e) =>
+                  setEditT({ ...editT, authorCompany: e.target.value })
+                }
               />
+            </div>
+            <div className="space-y-2 md:col-span-3">
+              <label className="block text-sm font-medium">
+                Profile Image (Optional)
+              </label>
+              <Input
+                type="url"
+                value={editT.authorAvatarUrl}
+                onChange={(e) =>
+                  setEditT({ ...editT, authorAvatarUrl: e.target.value })
+                }
+                placeholder="https://..."
+              />
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleAvatarUpload(e, "edit")}
+                className="block w-full text-sm"
+              />
+              {editT.authorAvatarUrl && (
+                <img
+                  src={editT.authorAvatarUrl}
+                  alt="Profile preview"
+                  className="h-12 w-12 rounded-full object-cover"
+                />
+              )}
             </div>
           </div>
           <div className="space-y-2">
@@ -296,7 +445,7 @@ export default function TestimonialsPage() {
             <textarea
               className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-transparent min-h-[100px]"
               value={editT.quote}
-              onChange={e => setEditT({ ...editT, quote: e.target.value })}
+              onChange={(e) => setEditT({ ...editT, quote: e.target.value })}
             />
           </div>
           <div className="flex items-center gap-6">
@@ -307,24 +456,46 @@ export default function TestimonialsPage() {
                 min="1"
                 max="5"
                 value={editT.rating}
-                onChange={e => setEditT({ ...editT, rating: parseInt(e.target.value) })}
+                onChange={(e) =>
+                  setEditT({ ...editT, rating: parseInt(e.target.value) })
+                }
                 className="w-20"
               />
             </div>
             <div className="flex items-center gap-4 pt-6">
               <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" checked={editT.isApproved} onChange={e => setEditT({ ...editT, isApproved: e.target.checked })} />
+                <input
+                  type="checkbox"
+                  checked={editT.isApproved}
+                  onChange={(e) =>
+                    setEditT({ ...editT, isApproved: e.target.checked })
+                  }
+                />
                 <span className="text-sm font-medium">Approved</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" checked={editT.isFeatured} onChange={e => setEditT({ ...editT, isFeatured: e.target.checked })} />
+                <input
+                  type="checkbox"
+                  checked={editT.isFeatured}
+                  onChange={(e) =>
+                    setEditT({ ...editT, isFeatured: e.target.checked })
+                  }
+                />
                 <span className="text-sm font-medium">Show on Portfolio</span>
               </label>
             </div>
           </div>
           <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setIsEditing(false)}>Cancel</Button>
-            <Button onClick={handleUpdateTestimonial}>Update Testimonial</Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsEditing(false)}
+            >
+              Cancel
+            </Button>
+            <Button type="button" onClick={handleUpdateTestimonial}>
+              Update Testimonial
+            </Button>
           </div>
         </div>
       )}
