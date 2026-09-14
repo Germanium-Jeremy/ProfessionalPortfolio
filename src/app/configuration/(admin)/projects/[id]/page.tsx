@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { RepeatableField } from "@/components/admin/RepeatableField";
 import { toast } from "sonner";
-import { ChevronLeft, Save, ImageIcon, Trash2 } from "lucide-react";
+import { ChevronLeft, Save, ImageIcon, Trash2, X } from "lucide-react";
 
 type Tab = "basics" | "description" | "links" | "facts" | "skills" | "gallery";
 type ProjectFormValues = z.input<typeof projectSchema>;
@@ -473,7 +473,7 @@ export default function ProjectEditor() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <label className="block text-sm font-medium">
-                Associated Skills
+                Project Skills
               </label>
               <div className="flex gap-2">
                 <Input
@@ -525,26 +525,67 @@ export default function ProjectEditor() {
                 </Button>
               </div>
             </div>
-            <div className="flex flex-wrap gap-2 p-3 border border-slate-300 dark:border-slate-600 rounded-md bg-slate-50 dark:bg-slate-900">
-              {skillsList.map((s) => (
-                <label
-                  key={s.id}
-                  className="flex items-center gap-2 px-2 py-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-xs cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700"
-                >
-                  <input
-                    type="checkbox"
-                    className="hidden"
-                    checked={skillIds.includes(s.id)}
-                    onChange={(e) => {
-                      const ids = e.target.checked
-                        ? [...skillIds, s.id]
-                        : skillIds.filter((id) => id !== s.id);
-                      setValue("skillIds", ids);
-                    }}
-                  />
-                  {s.name}
-                </label>
-              ))}
+            <div className="space-y-3">
+              <div className="flex min-h-12 flex-wrap gap-2 rounded-md border border-slate-300 bg-slate-50 p-3 dark:border-slate-600 dark:bg-slate-900">
+                {skillIds.length === 0 ? (
+                  <p className="text-xs italic text-slate-500">
+                    No skills added to this project.
+                  </p>
+                ) : (
+                  skillIds.map((skillId) => {
+                    const skill = skillsList.find(
+                      (item) => item.id === skillId,
+                    );
+                    if (!skill) return null;
+                    return (
+                      <span
+                        key={skill.id}
+                        className="inline-flex items-center gap-1 rounded-md border border-blue-200 bg-blue-50 px-2 py-1 text-xs text-blue-700 dark:border-blue-800 dark:bg-blue-900/30 dark:text-blue-300"
+                      >
+                        {skill.name}
+                        <button
+                          type="button"
+                          aria-label={`Remove ${skill.name}`}
+                          title={`Remove ${skill.name}`}
+                          onClick={() =>
+                            setValue(
+                              "skillIds",
+                              skillIds.filter((id) => id !== skill.id),
+                              { shouldDirty: true },
+                            )
+                          }
+                          className="rounded-full p-0.5 hover:bg-blue-200 dark:hover:bg-blue-800"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </span>
+                    );
+                  })
+                )}
+              </div>
+              <p className="text-xs font-medium text-slate-500">
+                Add from skill catalog
+              </p>
+              <div className="flex flex-wrap gap-2 rounded-md border border-slate-300 p-3 dark:border-slate-600">
+                {skillsList.map((skill) => {
+                  const isSelected = skillIds.includes(skill.id);
+                  return (
+                    <button
+                      key={skill.id}
+                      type="button"
+                      disabled={isSelected}
+                      onClick={() =>
+                        setValue("skillIds", [...skillIds, skill.id], {
+                          shouldDirty: true,
+                        })
+                      }
+                      className="rounded-md border border-slate-200 bg-white px-2 py-1 text-xs text-slate-700 transition-colors hover:border-blue-400 hover:text-blue-600 disabled:cursor-default disabled:opacity-40 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-blue-500 dark:hover:text-blue-300"
+                    >
+                      {skill.name}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
         )}
