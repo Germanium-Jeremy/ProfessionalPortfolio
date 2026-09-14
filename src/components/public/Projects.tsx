@@ -88,7 +88,7 @@ export function Projects({ projects }: ProjectsProps) {
                   {project.summary}
                 </p>
                 <div className="mt-5 flex flex-wrap items-center gap-2">
-                  {project.skills.slice(0, 4).map(({ skill }) => (
+                  {project.skills.slice(0, 6).map(({ skill }) => (
                     <span
                       className="rounded-full border border-white/15 bg-black/15 px-3 py-1 text-[10px] font-medium text-slate-200"
                       key={skill.name}

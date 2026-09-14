@@ -84,6 +84,7 @@ model Experience {
   role           String
   company        String
   companyUrl     String?
+  companyLogoUrl String?
   employmentType String?
   location       String?
   startDate      DateTime

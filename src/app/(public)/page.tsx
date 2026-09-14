@@ -63,6 +63,7 @@ export default async function PortfolioPage() {
     role: experience.role,
     company: experience.company,
     companyUrl: experience.companyUrl ?? undefined,
+    companyLogoUrl: experience.companyLogoUrl ?? undefined,
     employmentType: experience.employmentType ?? undefined,
     location: experience.location ?? undefined,
     startDate: experience.startDate.toISOString(),
