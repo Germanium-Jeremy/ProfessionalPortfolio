@@ -136,7 +136,20 @@ export default function ProjectEditor() {
 
   const onSubmit = async (data: ProjectInput) => {
     try {
-      const { skillIds = [], links = [], facts = [], ...projectData } = data;
+      const {
+        skillIds = [],
+        links = [],
+        facts = [],
+        gallery: submittedGallery,
+        coverImageUrl,
+        ...projectData
+      } = data;
+      const gallery = submittedGallery ?? [];
+      const selectedCoverImage =
+        coverImageUrl ||
+        (gallery.length > 0
+          ? gallery[Math.floor(Math.random() * gallery.length)]
+          : null);
       const method = isNew ? "POST" : "PATCH";
       const url = isNew
         ? "/api/configuration/projects"
@@ -145,7 +158,14 @@ export default function ProjectEditor() {
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...projectData, skillIds, links, facts }),
+        body: JSON.stringify({
+          ...projectData,
+          coverImageUrl: selectedCoverImage,
+          gallery,
+          skillIds,
+          links,
+          facts,
+        }),
       });
 
       const result = await res.json();
@@ -583,7 +603,10 @@ export default function ProjectEditor() {
                       const result = await res.json();
                       if (result.ok) {
                         const current = gallery;
-                        setValue("gallery", [...current, result.data.url]);
+                        setValue("gallery", [...current, result.data.url], {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        });
                         toast.success("Image uploaded");
                       } else {
                         toast.error(result.error || "Upload failed");

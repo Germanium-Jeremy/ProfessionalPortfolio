@@ -71,10 +71,10 @@ export function Projects({ projects }: ProjectsProps) {
               <div className="absolute inset-x-0 bottom-0 p-6 md:p-8">
                 <div className="mb-3 flex items-center justify-between">
                   <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-cyan-200">
-                    0{index + 1} / Case study
+                    0{index + 1} / Project
                   </span>
                   <Link
-                    href={`/projects/${project.slug}`}
+                    href={primaryLink?.url ?? "#"}
                     aria-label={`View ${project.title} details`}
                     className="grid h-9 w-9 place-items-center rounded-full border border-white/20 bg-black/20 text-white transition hover:bg-cyan-200 hover:text-[#07111f]"
                   >
