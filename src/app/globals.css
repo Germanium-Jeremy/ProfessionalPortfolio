@@ -136,18 +136,72 @@ body {
 
 .hero-portrait {
   position: relative;
-  padding: 1.75rem 1.5rem 0;
 }
 
-.hero-portrait::before {
-  content: "";
+.hero-portrait-frame {
+  position: relative;
+  width: min(100%, 28rem);
+  aspect-ratio: 1;
+  margin-inline: auto;
+}
+
+.hero-portrait-glow {
   position: absolute;
+  inset: 0;
   z-index: 0;
-  right: 8%;
-  bottom: 8%;
-  width: 70%;
-  height: 58%;
-  background: var(--accent-soft);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 50% 32%,
+    color-mix(in srgb, var(--secondary) 90%, white) 0%,
+    var(--accent) 48%,
+    color-mix(in srgb, var(--background) 30%, var(--accent) 70%) 78%,
+    var(--background) 100%
+  );
+}
+
+.hero-portrait-photo {
+  position: absolute;
+  inset: 5%;
+  z-index: 1;
+  overflow: hidden;
+  border-radius: 50%;
+}
+
+.hero-portrait-photo img {
+  transform: scale(1.28);
+  transform-origin: center 22%;
+}
+
+.experience-card {
+  border: 1px solid var(--rule);
+  background: var(--paper);
+  padding: 1.35rem 1.4rem;
+  text-align: left;
+  transition:
+    border-color 180ms ease,
+    transform 180ms ease;
+}
+
+.experience-card[aria-pressed="true"] {
+  border-color: var(--accent);
+}
+
+.experience-rail-link {
+  display: block;
+  border-radius: 999px;
+  padding: 0.85rem 1.25rem;
+  text-align: center;
+  font-weight: 650;
+  background: color-mix(in srgb, var(--foreground) 8%, transparent);
+}
+
+.experience-rail-link[aria-current="true"] {
+  background: var(--accent);
+  color: #fffcf7;
+}
+
+html.dark .experience-rail-link[aria-current="true"] {
+  color: #12141a;
 }
 
 .skills-sheet {
