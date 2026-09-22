@@ -7,6 +7,14 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 
+const skillCategoryOptions = [
+  { value: "languages", label: "Languages" },
+  { value: "frameworks-libraries", label: "Frameworks & Libraries" },
+  { value: "databases-backend", label: "Databases & Backend" },
+  { value: "devops-tools", label: "DevOps & Tools" },
+  { value: "specialized-domains", label: "Specialized Domains (AI & IoT)" },
+] as const;
+
 interface Skill {
   id: string;
   name: string;
@@ -23,14 +31,14 @@ export default function SkillsPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [newSkill, setNewSkill] = useState({
     name: "",
-    category: "language",
+    category: "languages",
     level: 3,
     isFeatured: false,
   });
   const [editSkill, setEditSkill] = useState({
     id: "",
     name: "",
-    category: "language",
+    category: "languages",
     level: 3,
     isFeatured: false,
   });
@@ -103,7 +111,7 @@ export default function SkillsPage() {
         toast.success("Skill added");
         setNewSkill({
           name: "",
-          category: "language",
+          category: "languages",
           level: 3,
           isFeatured: false,
         });
@@ -216,12 +224,11 @@ export default function SkillsPage() {
                   setNewSkill({ ...newSkill, category: e.target.value })
                 }
               >
-                <option value="language">Language</option>
-                <option value="framework">Framework</option>
-                <option value="tool">Tool</option>
-                <option value="devops">DevOps</option>
-                <option value="design">Design</option>
-                <option value="soft">Soft Skill</option>
+                {skillCategoryOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
               </select>
             </div>
             <div className="space-y-2">
@@ -285,12 +292,11 @@ export default function SkillsPage() {
                   setEditSkill({ ...editSkill, category: e.target.value })
                 }
               >
-                <option value="language">Language</option>
-                <option value="framework">Framework</option>
-                <option value="tool">Tool</option>
-                <option value="devops">DevOps</option>
-                <option value="design">Design</option>
-                <option value="soft">Soft Skill</option>
+                {skillCategoryOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
               </select>
             </div>
             <div className="space-y-2">
