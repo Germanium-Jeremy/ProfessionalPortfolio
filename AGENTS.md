@@ -110,3 +110,13 @@ Recommended fix: revalidate the public paths affected by the project, including 
 4. Define and implement an atomic project save contract for links, facts, skills, and gallery; add a reload-based regression test.
 5. Add explicit button types, correct settings JSON persistence, and public-path revalidation.
 6. Clear the lint errors, then make `pnpm lint` part of CI.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
