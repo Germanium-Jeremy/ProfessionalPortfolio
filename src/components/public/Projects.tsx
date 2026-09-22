@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight, Code2, ExternalLink } from "lucide-react";
+import { ArrowUpRight, Code2, ExternalLink, GitBranch } from "lucide-react";
 
 interface Project {
   id: string;
@@ -44,6 +44,9 @@ export function Projects({ projects }: ProjectsProps) {
             project.links.find((link) => link.isPrimary) ??
             project.links.find((link) => link.kind === "live") ??
             project.links.find((link) => link.kind === "github");
+          const githubLink = project.links.find(
+            (link) => link.kind === "github" && link.url !== primaryLink?.url,
+          );
           return (
             <article
               key={project.id}
@@ -104,6 +107,17 @@ export function Projects({ projects }: ProjectsProps) {
                       className="ml-auto inline-flex items-center gap-1 text-xs font-bold text-cyan-200 hover:text-white"
                     >
                       {primaryLink.label} <ExternalLink className="h-3 w-3" />
+                    </a>
+                  )}
+                  {githubLink && (
+                    <a
+                      href={githubLink.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-xs font-bold text-cyan-200 hover:text-white"
+                    >
+                      <GitBranch className="h-3 w-3" />{" "}
+                      {githubLink.label || "Repository"}
                     </a>
                   )}
                 </div>
