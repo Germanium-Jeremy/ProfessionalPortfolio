@@ -1,5 +1,15 @@
 # Application Findings
 
+## Implemented Portfolio Features (2026-09-22)
+
+- Project order is controlled from the admin Projects page with up/down controls. The controls persist contiguous `sortOrder` values through the existing project `PATCH` endpoint, and the public page already reads projects in ascending order.
+- Public visitors can open the testimonial form in the Testimonials section and submit their name, role, company, optional email, rating, and quote through `/api/public/testimonials`.
+- Public testimonial submissions are always created with `isApproved: false` and `isFeatured: false`. An administrator must approve and feature them before they appear publicly.
+- Project cards show a separate GitHub repository action whenever a GitHub project link exists and is not already the selected primary action.
+- No Prisma migration was required for these features. The existing `Project.sortOrder` and `Testimonial.isApproved`/`isFeatured` fields provide the persistence contract.
+
+The older findings below remain as follow-up items from the earlier review.
+
 This document records the current compile, runtime, and configuration-save risks found during a local review on 2026-09-13. No application files were changed as part of this review.
 
 ## Confirmed Validation Results
