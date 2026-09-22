@@ -39,12 +39,12 @@ export function Hero({ profile, socials }: HeroProps) {
   const { kicker, title } = splitDisplayName(profile.fullName);
 
   return (
-    <section className="mx-auto grid max-w-360 items-end gap-8 px-5 pb-16 pt-28 md:px-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:gap-14 lg:pb-24 lg:pt-32">
+    <section className="mx-auto grid max-w-360 items-center gap-8 px-5 pb-16 pt-28 md:px-10 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,24rem)] lg:gap-10 lg:pb-24 lg:pt-32">
       <motion.div
         initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="order-2 min-w-0 lg:order-1 lg:pb-8"
+        className="order-2 min-w-0 lg:order-1"
       >
         {profile.availability && (
           <p className="section-index mb-6">{profile.availability}</p>
@@ -101,23 +101,26 @@ export function Hero({ profile, socials }: HeroProps) {
         initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, delay: 0.08 }}
-        className="hero-portrait order-1 mx-auto w-full max-w-sm lg:order-2 lg:max-w-none"
+        className="hero-portrait order-1 mx-auto w-full max-w-md lg:order-2 lg:max-w-none"
       >
-        <div className="relative z-10 mx-auto aspect-3/4 w-full max-w-[22rem]">
-          {profile.avatarUrl ? (
-            <Image
-              src={profile.avatarUrl}
-              alt={profile.fullName}
-              fill
-              priority
-              sizes="(max-width: 1024px) 70vw, 22rem"
-              className="object-contain object-bottom"
-            />
-          ) : (
-            <div className="grid h-full place-items-center text-8xl font-black text-[var(--accent)]/30">
-              {profile.fullName.slice(0, 1)}
-            </div>
-          )}
+        <div className="hero-portrait-frame">
+          <div className="hero-portrait-glow" aria-hidden="true" />
+          <div className="hero-portrait-photo">
+            {profile.avatarUrl ? (
+              <Image
+                src={profile.avatarUrl}
+                alt={profile.fullName}
+                fill
+                priority
+                sizes="(max-width: 1024px) 70vw, 24rem"
+                className="object-cover object-[center_18%]"
+              />
+            ) : (
+              <div className="grid h-full place-items-center text-8xl font-black text-[var(--accent)]/40">
+                {profile.fullName.slice(0, 1)}
+              </div>
+            )}
+          </div>
         </div>
       </motion.figure>
     </section>
