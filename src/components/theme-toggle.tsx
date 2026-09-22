@@ -5,10 +5,11 @@ import { Sun, Moon } from 'lucide-react';
 
 export function ThemeToggle() {
   const [dark, setDark] = useState(false);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const isDark = document.documentElement.classList.contains('dark');
-    setTimeout(() => setDark(isDark), 0);
+    setDark(document.documentElement.classList.contains('dark'));
+    setReady(true);
   }, []);
 
   const toggle = () => {
@@ -20,11 +21,12 @@ export function ThemeToggle() {
 
   return (
     <button
+      type="button"
       onClick={toggle}
-      className="p-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+      className="border border-[var(--rule)] p-2 transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)]"
       aria-label="Toggle theme"
     >
-      {dark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+      {ready && dark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
     </button>
   );
 }
