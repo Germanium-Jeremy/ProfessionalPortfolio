@@ -175,7 +175,10 @@ export default async function PortfolioPage() {
         />
         <About profile={{ bio: profile.bio, funFacts }} />
         <Skills skills={formattedSkills} />
-        <Experience experiences={formattedExperiences} />
+        <Experience
+          experiences={formattedExperiences}
+          resumeUrl={profile.resumeUrl ?? undefined}
+        />
         <Projects projects={formattedProjects} />
         <Testimonials testimonials={formattedTestimonials} />
         <Contact channels={formattedContacts} />
