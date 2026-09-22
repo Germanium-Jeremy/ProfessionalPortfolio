@@ -138,7 +138,7 @@ export function Testimonials({ testimonials }: TestimonialsProps) {
           </button>
           {submitted && (
             <p className="text-sm text-cyan-200 md:col-span-2">
-              Thanks. Your testimonial will appear after approval.
+              Thanks for sharing your testimonial.
             </p>
           )}
         </form>
