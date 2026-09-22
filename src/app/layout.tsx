@@ -6,6 +6,9 @@ import Script from "next/script";
 export const metadata: Metadata = {
   title: "Portfolio",
   description: "Personal portfolio and project showcase",
+  icons: {
+    icon: "/favicon.png",
+  }
 };
 
 export default function RootLayout({

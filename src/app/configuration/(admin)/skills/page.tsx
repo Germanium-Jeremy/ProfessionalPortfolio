@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState } from 'react';
-import { DataTable, type Column } from '@/components/admin/DataTable';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { toast } from 'sonner';
-import { Plus, Pencil, Trash2 } from 'lucide-react';
+import React, { useEffect, useState } from "react";
+import { DataTable, type Column } from "@/components/admin/DataTable";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
+import { Plus, Pencil, Trash2 } from "lucide-react";
 
 interface Skill {
   id: string;
@@ -22,15 +22,15 @@ export default function SkillsPage() {
   const [isAdding, setIsAdding] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [newSkill, setNewSkill] = useState({
-    name: '',
-    category: 'language',
+    name: "",
+    category: "language",
     level: 3,
     isFeatured: false,
   });
   const [editSkill, setEditSkill] = useState({
-    id: '',
-    name: '',
-    category: 'language',
+    id: "",
+    name: "",
+    category: "language",
     level: 3,
     isFeatured: false,
   });
@@ -41,13 +41,13 @@ export default function SkillsPage() {
 
   async function loadSkills() {
     try {
-      const res = await fetch('/api/configuration/skills');
+      const res = await fetch("/api/configuration/skills");
       const result = await res.json();
       if (result.ok) {
         setSkills(result.data);
       }
     } catch {
-      toast.error('Failed to load skills');
+      toast.error("Failed to load skills");
     } finally {
       setIsLoading(false);
     }
@@ -67,63 +67,76 @@ export default function SkillsPage() {
 
   async function handleUpdateSkill() {
     try {
+      const skillData = {
+        name: editSkill.name,
+        category: editSkill.category,
+        level: editSkill.level,
+        isFeatured: editSkill.isFeatured,
+      };
       const res = await fetch(`/api/configuration/skills/${editSkill.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(editSkill),
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(skillData),
       });
       const result = await res.json();
       if (result.ok) {
-        toast.success('Skill updated');
+        toast.success("Skill updated");
         setIsEditing(false);
         loadSkills();
       } else {
-        toast.error(result.error?.message || 'Failed to update skill');
+        toast.error(result.error?.message || "Failed to update skill");
       }
     } catch {
-      toast.error('An unexpected error occurred');
+      toast.error("An unexpected error occurred");
     }
   }
 
   async function handleAddSkill() {
     try {
-      const res = await fetch('/api/configuration/skills', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/configuration/skills", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newSkill),
       });
       const result = await res.json();
       if (result.ok) {
-        toast.success('Skill added');
-        setNewSkill({ name: '', category: 'language', level: 3, isFeatured: false });
+        toast.success("Skill added");
+        setNewSkill({
+          name: "",
+          category: "language",
+          level: 3,
+          isFeatured: false,
+        });
         setIsAdding(false);
         loadSkills();
       } else {
-        toast.error(result.error?.message || 'Failed to add skill');
+        toast.error(result.error?.message || "Failed to add skill");
       }
     } catch {
-      toast.error('An unexpected error occurred');
+      toast.error("An unexpected error occurred");
     }
   }
 
   async function handleDeleteSkill(id: string) {
-    if (!confirm('Are you sure you want to delete this skill?')) return;
+    if (!confirm("Are you sure you want to delete this skill?")) return;
     try {
-      const res = await fetch(`/api/configuration/skills/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/configuration/skills/${id}`, {
+        method: "DELETE",
+      });
       if (res.ok) {
-        toast.success('Skill deleted');
+        toast.success("Skill deleted");
         loadSkills();
       }
     } catch {
-      toast.error('Failed to delete skill');
+      toast.error("Failed to delete skill");
     }
   }
 
   const columns: Column<Skill>[] = [
-    { header: 'Name', accessor: 'name', sortable: true },
-    { header: 'Category', accessor: 'category', sortable: true },
+    { header: "Name", accessor: "name", sortable: true },
+    { header: "Category", accessor: "category", sortable: true },
     {
-      header: 'Level',
+      header: "Level",
       accessor: (s) => (
         <div className="flex gap-1">
           {Array.from({ length: 5 }).map((_, i) => (
@@ -131,16 +144,16 @@ export default function SkillsPage() {
               key={i}
               className={cn(
                 "w-2 h-2 rounded-full",
-                i < s.level ? "bg-blue-500" : "bg-slate-200 dark:bg-slate-700"
+                i < s.level ? "bg-blue-500" : "bg-slate-200 dark:bg-slate-700",
               )}
             />
           ))}
         </div>
       ),
     },
-    { header: 'Featured', accessor: (s) => (s.isFeatured ? '✅' : '❌') },
+    { header: "Featured", accessor: (s) => (s.isFeatured ? "✅" : "❌") },
     {
-      header: 'Actions',
+      header: "Actions",
       accessor: (s) => (
         <div className="flex gap-2">
           <Button
@@ -171,7 +184,13 @@ export default function SkillsPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Skills Management</h1>
         <Button onClick={() => setIsAdding(!isAdding)} className="gap-2">
-          {isAdding ? 'Cancel' : <><Plus className="w-4 h-4" /> Add Skill</>}
+          {isAdding ? (
+            "Cancel"
+          ) : (
+            <>
+              <Plus className="w-4 h-4" /> Add Skill
+            </>
+          )}
         </Button>
       </div>
 
@@ -182,7 +201,9 @@ export default function SkillsPage() {
               <label className="block text-sm font-medium">Name</label>
               <Input
                 value={newSkill.name}
-                onChange={e => setNewSkill({ ...newSkill, name: e.target.value })}
+                onChange={(e) =>
+                  setNewSkill({ ...newSkill, name: e.target.value })
+                }
                 placeholder="e.g. TypeScript"
               />
             </div>
@@ -191,7 +212,9 @@ export default function SkillsPage() {
               <select
                 className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm"
                 value={newSkill.category}
-                onChange={e => setNewSkill({ ...newSkill, category: e.target.value })}
+                onChange={(e) =>
+                  setNewSkill({ ...newSkill, category: e.target.value })
+                }
               >
                 <option value="language">Language</option>
                 <option value="framework">Framework</option>
@@ -208,7 +231,9 @@ export default function SkillsPage() {
                 min="1"
                 max="5"
                 value={newSkill.level}
-                onChange={e => setNewSkill({ ...newSkill, level: parseInt(e.target.value) })}
+                onChange={(e) =>
+                  setNewSkill({ ...newSkill, level: parseInt(e.target.value) })
+                }
               />
             </div>
             <div className="flex items-center gap-2 py-8">
@@ -216,14 +241,23 @@ export default function SkillsPage() {
                 type="checkbox"
                 id="featured"
                 checked={newSkill.isFeatured}
-                onChange={e => setNewSkill({ ...newSkill, isFeatured: e.target.checked })}
+                onChange={(e) =>
+                  setNewSkill({ ...newSkill, isFeatured: e.target.checked })
+                }
                 className="w-4 h-4"
               />
-              <label htmlFor="featured" className="text-sm font-medium cursor-pointer">Featured</label>
+              <label
+                htmlFor="featured"
+                className="text-sm font-medium cursor-pointer"
+              >
+                Featured
+              </label>
             </div>
           </div>
           <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setIsAdding(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setIsAdding(false)}>
+              Cancel
+            </Button>
             <Button onClick={handleAddSkill}>Save Skill</Button>
           </div>
         </div>
@@ -236,7 +270,9 @@ export default function SkillsPage() {
               <label className="block text-sm font-medium">Name</label>
               <Input
                 value={editSkill.name}
-                onChange={e => setEditSkill({ ...editSkill, name: e.target.value })}
+                onChange={(e) =>
+                  setEditSkill({ ...editSkill, name: e.target.value })
+                }
                 placeholder="e.g. TypeScript"
               />
             </div>
@@ -245,7 +281,9 @@ export default function SkillsPage() {
               <select
                 className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm"
                 value={editSkill.category}
-                onChange={e => setEditSkill({ ...editSkill, category: e.target.value })}
+                onChange={(e) =>
+                  setEditSkill({ ...editSkill, category: e.target.value })
+                }
               >
                 <option value="language">Language</option>
                 <option value="framework">Framework</option>
@@ -262,7 +300,12 @@ export default function SkillsPage() {
                 min="1"
                 max="5"
                 value={editSkill.level}
-                onChange={e => setEditSkill({ ...editSkill, level: parseInt(e.target.value) })}
+                onChange={(e) =>
+                  setEditSkill({
+                    ...editSkill,
+                    level: parseInt(e.target.value),
+                  })
+                }
               />
             </div>
             <div className="flex items-center gap-2 py-8">
@@ -270,14 +313,23 @@ export default function SkillsPage() {
                 type="checkbox"
                 id="edit-featured"
                 checked={editSkill.isFeatured}
-                onChange={e => setEditSkill({ ...editSkill, isFeatured: e.target.checked })}
+                onChange={(e) =>
+                  setEditSkill({ ...editSkill, isFeatured: e.target.checked })
+                }
                 className="w-4 h-4"
               />
-              <label htmlFor="edit-featured" className="text-sm font-medium cursor-pointer">Featured</label>
+              <label
+                htmlFor="edit-featured"
+                className="text-sm font-medium cursor-pointer"
+              >
+                Featured
+              </label>
             </div>
           </div>
           <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setIsEditing(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setIsEditing(false)}>
+              Cancel
+            </Button>
             <Button onClick={handleUpdateSkill}>Update Skill</Button>
           </div>
         </div>
@@ -293,5 +345,5 @@ export default function SkillsPage() {
 }
 
 function cn(...classes: (string | boolean | undefined)[]) {
-  return classes.filter(Boolean).join(' ');
+  return classes.filter(Boolean).join(" ");
 }
