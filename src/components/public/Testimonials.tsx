@@ -1,7 +1,8 @@
 "use client";
 
-import { ExternalLink, Quote, Star } from "lucide-react";
+import { ExternalLink, Star } from "lucide-react";
 import { useState } from "react";
+import { SectionHeading } from "@/components/public/SectionHeading";
 
 interface Testimonial {
   authorName: string;
@@ -20,6 +21,7 @@ export function Testimonials({ testimonials }: TestimonialsProps) {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState(false);
   const [form, setForm] = useState({
     authorName: "",
     authorRole: "",
@@ -32,6 +34,7 @@ export function Testimonials({ testimonials }: TestimonialsProps) {
   async function submitTestimonial(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setIsSubmitting(true);
+    setError(false);
     try {
       const response = await fetch("/api/public/testimonials", {
         method: "POST",
@@ -52,154 +55,151 @@ export function Testimonials({ testimonials }: TestimonialsProps) {
         rating: 5,
       });
     } catch {
-      setSubmitted(false);
+      setError(true);
     } finally {
       setIsSubmitting(false);
     }
   }
 
   return (
-    <section
-      id="testimonials"
-      className="mx-auto max-w-[90rem] px-5 py-20 md:px-10 lg:py-32"
-    >
-      <div className="mb-12 flex flex-col justify-between gap-5 md:flex-row md:items-end">
-        <div>
-          <p className="section-kicker">06 / Testimonials</p>
-          <h2 className="mt-4 text-4xl font-black tracking-[-0.06em] text-white md:text-6xl">
-            Kind words from good people.
-          </h2>
-        </div>
-        <button
-          type="button"
-          onClick={() => {
-            setIsFormOpen(!isFormOpen);
-            setSubmitted(false);
-          }}
-          className="text-left text-sm font-bold text-cyan-200 hover:text-white"
-        >
-          {isFormOpen ? "Close form" : "Leave a testimonial"}
-        </button>
-      </div>
-      {isFormOpen && (
-        <form
-          onSubmit={submitTestimonial}
-          className="mb-8 grid gap-4 rounded-[2rem] border border-white/10 bg-white/[0.045] p-6 md:grid-cols-2"
-        >
-          <input
-            required
-            placeholder="Your name"
-            value={form.authorName}
-            onChange={(event) =>
-              setForm({ ...form, authorName: event.target.value })
-            }
-            className="rounded-md border border-white/15 bg-black/20 px-3 py-2 text-white placeholder:text-slate-500"
-          />
-          <input
-            placeholder="Role"
-            value={form.authorRole}
-            onChange={(event) =>
-              setForm({ ...form, authorRole: event.target.value })
-            }
-            className="rounded-md border border-white/15 bg-black/20 px-3 py-2 text-white placeholder:text-slate-500"
-          />
-          <input
-            placeholder="Company"
-            value={form.authorCompany}
-            onChange={(event) =>
-              setForm({ ...form, authorCompany: event.target.value })
-            }
-            className="rounded-md border border-white/15 bg-black/20 px-3 py-2 text-white placeholder:text-slate-500"
-          />
-          <input
-            type="email"
-            placeholder="Email (optional)"
-            value={form.authorEmail}
-            onChange={(event) =>
-              setForm({ ...form, authorEmail: event.target.value })
-            }
-            className="rounded-md border border-white/15 bg-black/20 px-3 py-2 text-white placeholder:text-slate-500"
-          />
-          <textarea
-            required
-            placeholder="Your testimonial"
-            value={form.quote}
-            onChange={(event) =>
-              setForm({ ...form, quote: event.target.value })
-            }
-            className="min-h-32 rounded-md border border-white/15 bg-black/20 px-3 py-2 text-white placeholder:text-slate-500 md:col-span-2"
-          />
+    <section id="testimonials" style={{ background: "var(--section-quotes)" }}>
+      <div className="mx-auto max-w-360 px-5 py-20 md:px-10 lg:py-28">
+        <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
+          <SectionHeading index="06" title="Testimonials">
+            Kind words from people I’ve worked with.
+          </SectionHeading>
           <button
-            type="submit"
-            disabled={isSubmitting}
-            className="rounded-md bg-cyan-200 px-4 py-2 text-sm font-bold text-[#07111f] disabled:opacity-50 md:col-span-2"
+            type="button"
+            onClick={() => {
+              setIsFormOpen(!isFormOpen);
+              setSubmitted(false);
+              setError(false);
+            }}
+            className="mb-10 text-left font-bold text-[var(--accent)]"
           >
-            {isSubmitting ? "Submitting..." : "Submit testimonial"}
+            {isFormOpen ? "Close form" : "Leave a testimonial"}
           </button>
-          {submitted && (
-            <p className="text-sm text-cyan-200 md:col-span-2">
-              Thanks for sharing your testimonial.
-            </p>
-          )}
-        </form>
-      )}
-      <div className="grid gap-4 lg:grid-cols-3">
-        {testimonials.map((testimonial) => (
-          <figure
-            key={`${testimonial.authorName}-${testimonial.quote}`}
-            className="relative flex min-h-72 flex-col rounded-[2rem] border border-white/10 bg-white/[0.045] p-7 md:p-8"
+        </div>
+
+        {isFormOpen && (
+          <form
+            onSubmit={submitTestimonial}
+            className="mb-12 grid gap-4 border border-[var(--rule)] bg-[var(--paper)] p-6 md:grid-cols-2"
           >
-            <Quote className="mb-5 h-7 w-7 text-cyan-200" />
-            <blockquote className="text-lg leading-8 tracking-[-0.01em] text-slate-200">
-              “{testimonial.quote}”
-            </blockquote>
-            <figcaption className="mt-auto flex items-end justify-between gap-3 pt-8">
-              <div className="flex items-center gap-3">
-                {testimonial.authorAvatarUrl ? (
-                  <img
-                    src={testimonial.authorAvatarUrl}
-                    alt=""
-                    className="h-10 w-10 rounded-full object-cover"
-                  />
-                ) : (
-                  <span className="grid h-10 w-10 place-items-center rounded-full bg-cyan-200/10 text-sm font-bold text-cyan-100">
-                    {testimonial.authorName[0]}
-                  </span>
-                )}
+            <input
+              required
+              placeholder="Your name"
+              value={form.authorName}
+              onChange={(event) =>
+                setForm({ ...form, authorName: event.target.value })
+              }
+              className="contact-field"
+            />
+            <input
+              placeholder="Role"
+              value={form.authorRole}
+              onChange={(event) =>
+                setForm({ ...form, authorRole: event.target.value })
+              }
+              className="contact-field"
+            />
+            <input
+              placeholder="Company"
+              value={form.authorCompany}
+              onChange={(event) =>
+                setForm({ ...form, authorCompany: event.target.value })
+              }
+              className="contact-field"
+            />
+            <input
+              type="email"
+              placeholder="Email (optional)"
+              value={form.authorEmail}
+              onChange={(event) =>
+                setForm({ ...form, authorEmail: event.target.value })
+              }
+              className="contact-field"
+            />
+            <textarea
+              required
+              placeholder="Your testimonial"
+              value={form.quote}
+              onChange={(event) =>
+                setForm({ ...form, quote: event.target.value })
+              }
+              className="contact-field min-h-32 md:col-span-2"
+            />
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="btn-primary md:col-span-2"
+            >
+              {isSubmitting ? "Submitting..." : "Submit testimonial"}
+            </button>
+            {submitted && (
+              <p className="text-[var(--secondary)] md:col-span-2">
+                Thanks for sharing your testimonial.
+              </p>
+            )}
+            {error && (
+              <p className="text-[var(--accent)] md:col-span-2">
+                Couldn’t submit just now. Please try again.
+              </p>
+            )}
+          </form>
+        )}
+
+        <div className="space-y-10">
+          {testimonials.map((testimonial, index) => (
+            <figure
+              key={`${testimonial.authorName}-${testimonial.quote}`}
+              className="border-t border-[var(--foreground)]/15 pt-8"
+            >
+              <blockquote className="type-display text-3xl leading-snug md:text-4xl">
+                “{testimonial.quote}”
+              </blockquote>
+              <figcaption className="mt-6 flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <p className="text-sm font-bold text-white">
-                    {testimonial.authorName}
-                  </p>
-                  <p className="text-xs text-slate-500">
+                  <p className="font-bold">{testimonial.authorName}</p>
+                  <p className="type-muted text-base">
                     {[testimonial.authorRole, testimonial.authorCompany]
                       .filter(Boolean)
                       .join(" · ")}
                   </p>
                 </div>
-              </div>
-              <div>
-                {testimonial.rating && (
-                  <div className="flex gap-0.5 text-cyan-200">
-                    {Array.from({ length: testimonial.rating }, (_, index) => (
-                      <Star key={index} className="h-3 w-3 fill-current" />
-                    ))}
-                  </div>
-                )}
-                {testimonial.sourceUrl && (
-                  <a
-                    href={testimonial.sourceUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="View testimonial source"
-                    className="mt-2 inline-flex text-slate-400 hover:text-white"
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                  </a>
-                )}
-              </div>
-            </figcaption>
-          </figure>
-        ))}
+                <div className="flex items-center gap-3">
+                  {testimonial.rating && (
+                    <div className="flex gap-0.5 text-[var(--accent)]">
+                      {Array.from(
+                        { length: testimonial.rating },
+                        (_, starIndex) => (
+                          <Star
+                            key={starIndex}
+                            className="h-3.5 w-3.5 fill-current"
+                          />
+                        ),
+                      )}
+                    </div>
+                  )}
+                  {testimonial.sourceUrl && (
+                    <a
+                      href={testimonial.sourceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="View testimonial source"
+                      className="text-[var(--muted)] hover:text-[var(--accent)]"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                    </a>
+                  )}
+                  <span className="text-sm tracking-[0.16em] text-[var(--muted)]">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                </div>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
       </div>
     </section>
   );
