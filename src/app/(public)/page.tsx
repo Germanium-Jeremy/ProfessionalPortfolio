@@ -113,7 +113,7 @@ export default async function PortfolioPage() {
     .filter((contact) => contact.kind !== "email" && contact.kind !== "phone")
     .map((contact) => ({
       kind: contact.kind,
-      url: "https://github.com",
+      url: "https://github.com/Germanium-Jeremy",
       iconKey: contact.iconKey ?? undefined,
     }));
   const funFacts = parseJsonArray(profile.funFacts) ?? [];

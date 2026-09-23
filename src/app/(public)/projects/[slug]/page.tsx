@@ -48,35 +48,31 @@ export default async function ProjectPage({
   const previewImage = project.coverImageUrl ?? gallery[0];
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100">
-      <div className="max-w-5xl mx-auto px-4 py-12 space-y-12">
+    <div className="portfolio-shell min-h-screen">
+      <div className="mx-auto max-w-5xl space-y-10 px-5 py-12 md:px-10">
         <Link
-          href="/"
-          className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-blue-500 transition-colors"
+          href="/#work"
+          className="inline-flex items-center gap-2 text-[var(--muted)] hover:text-[var(--accent)]"
         >
-          <ChevronLeft className="w-4 h-4" /> Back to projects
+          <ChevronLeft className="h-4 w-4" /> Back to projects
         </Link>
 
-        <div className="space-y-6">
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
-            {project.title}
-          </h1>
-          <p className="text-xl text-slate-600 dark:text-slate-400 max-w-3xl">
-            {project.summary}
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {project.skills.map((s) => (
+        <div>
+          <h1 className="type-display text-4xl md:text-6xl">{project.title}</h1>
+          <p className="type-body type-muted mt-5 max-w-3xl">{project.summary}</p>
+          <div className="mt-5 flex flex-wrap gap-2">
+            {project.skills.map((item) => (
               <span
-                key={s.skill.id}
-                className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-700 text-xs font-medium text-slate-500 dark:text-slate-400"
+                key={item.skill.id}
+                className="border border-[var(--rule)] px-3 py-1 text-sm text-[var(--muted)]"
               >
-                {s.skill.name}
+                {item.skill.name}
               </span>
             ))}
           </div>
         </div>
 
-        <div className="aspect-video relative rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-200 dark:bg-slate-800">
+        <div className="relative aspect-video overflow-hidden border border-[var(--rule)] bg-[var(--paper)]">
           {previewImage ? (
             <Image
               src={previewImage}
@@ -85,8 +81,8 @@ export default async function ProjectPage({
               className="object-cover"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-slate-400">
-              <Layout className="w-16 h-16 opacity-20" />
+            <div className="flex h-full w-full items-center justify-center text-[var(--muted)]">
+              <Layout className="h-16 w-16 opacity-20" />
             </div>
           )}
         </div>
@@ -96,7 +92,7 @@ export default async function ProjectPage({
             {gallery.map((imageUrl, index) => (
               <div
                 key={`${imageUrl}-${index}`}
-                className="relative aspect-video overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700"
+                className="relative aspect-video overflow-hidden border border-[var(--rule)]"
               >
                 <Image
                   src={imageUrl}
@@ -109,21 +105,19 @@ export default async function ProjectPage({
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-          <div className="lg:col-span-2 space-y-8">
-            <div className="prose dark:prose-invert max-w-none text-lg text-slate-600 dark:text-slate-300">
-              <ReactMarkdown
-                remarkPlugins={[remarkGfm]}
-                rehypePlugins={[rehypeSanitize]}
-              >
-                {project.description || "No description provided."}
-              </ReactMarkdown>
-            </div>
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-3">
+          <div className="portfolio-prose type-muted lg:col-span-2">
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              rehypePlugins={[rehypeSanitize]}
+            >
+              {project.description || "No description provided."}
+            </ReactMarkdown>
           </div>
 
           <div className="space-y-8">
-            <div className="p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 space-y-6">
-              <h3 className="font-bold text-lg">Project Links</h3>
+            <div className="space-y-4 border border-[var(--rule)] bg-[var(--paper)] p-6">
+              <h3 className="type-display text-2xl">Project Links</h3>
               <div className="space-y-3">
                 {project.links.map((link) => (
                   <a
@@ -131,27 +125,25 @@ export default async function ProjectPage({
                     href={link.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={cn(
-                      "flex items-center justify-between p-3 rounded-lg border transition-colors",
-                      link.isPrimary
-                        ? "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 font-medium"
-                        : "bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600",
-                    )}
+                    className="flex items-center justify-between border border-[var(--rule)] p-3 text-sm hover:border-[var(--accent)] hover:text-[var(--accent)]"
                   >
-                    <span className="text-sm">{link.label}</span>
-                    <ExternalLink className="w-4 h-4" />
+                    <span>{link.label}</span>
+                    <ExternalLink className="h-4 w-4" />
                   </a>
                 ))}
               </div>
             </div>
 
             {project.facts.length > 0 && (
-              <div className="p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 space-y-4">
-                <h3 className="font-bold text-lg">Key Facts</h3>
+              <div className="space-y-4 border border-[var(--rule)] bg-[var(--paper)] p-6">
+                <h3 className="type-display text-2xl">Key Facts</h3>
                 <div className="space-y-3">
                   {project.facts.map((fact) => (
-                    <div key={fact.id} className="flex justify-between text-sm">
-                      <span className="text-slate-500">{fact.label}</span>
+                    <div
+                      key={fact.id}
+                      className="flex justify-between gap-3 text-sm"
+                    >
+                      <span className="type-muted">{fact.label}</span>
                       <span className="font-medium">{fact.value}</span>
                     </div>
                   ))}
@@ -163,8 +155,4 @@ export default async function ProjectPage({
       </div>
     </div>
   );
-}
-
-function cn(...classes: (string | boolean | undefined)[]) {
-  return classes.filter(Boolean).join(" ");
 }
