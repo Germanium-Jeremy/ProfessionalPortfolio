@@ -1,121 +1,239 @@
 @import "tailwindcss";
 
 :root {
-  --background: #07111f;
-  --foreground: #ecf4ff;
+  --background: #f4f1ea;
+  --foreground: #16181d;
+  --muted: #5d616a;
+  --accent: #1f4e8c;
+  --accent-soft: #d5e2f4;
+  --secondary: #b44a1f;
+  --paper: #fffcf7;
+  --rule: rgba(22, 24, 29, 0.12);
+  --invert: #12141a;
+  --invert-fg: #f4f1ea;
+  --section-about: #e9edf2;
+  --section-skills: #e7ece3;
+  --section-experience: #f7f3ea;
+  --section-work: #12141a;
+  --section-work-fg: #f4f1ea;
+  --section-quotes: #efe4d6;
+  --section-contact: #1b335c;
+  --section-contact-fg: #f4f1ea;
+}
+
+html.dark {
+  --background: #101318;
+  --foreground: #efece4;
+  --muted: #b3b7c0;
+  --accent: #8fb0e4;
+  --accent-soft: #24344d;
+  --secondary: #e08a5a;
+  --paper: #181c24;
+  --rule: rgba(239, 236, 228, 0.12);
+  --invert: #efece4;
+  --invert-fg: #12141a;
+  --section-about: #151a22;
+  --section-skills: #141914;
+  --section-experience: #17140f;
+  --section-work: #0c0e12;
+  --section-work-fg: #efece4;
+  --section-quotes: #1c1813;
+  --section-contact: #15243c;
+  --section-contact-fg: #efece4;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-source);
+  --font-display: var(--font-fraunces);
 }
 
-* { border-color: color-mix(in srgb, currentColor 10%, transparent); }
+* {
+  border-color: var(--rule);
+}
 
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+}
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), "Segoe UI", sans-serif;
 }
 
-.portfolio-shell { isolation: isolate; }
-
-.portfolio-grid {
-  background-image: linear-gradient(rgba(148, 163, 184, 0.055) 1px, transparent 1px), linear-gradient(90deg, rgba(148, 163, 184, 0.055) 1px, transparent 1px);
-  background-size: 46px 46px;
-  mask-image: linear-gradient(to bottom, black, transparent 82%);
+.portfolio-shell {
+  isolation: isolate;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), "Segoe UI", sans-serif;
+  font-size: 1.125rem;
+  line-height: 1.7;
 }
 
-.section-kicker {
-  color: rgb(20, 138, 151);
-  font-size: 0.6875rem;
+.portfolio-shell h1,
+.portfolio-shell h2,
+.portfolio-shell h3,
+.portfolio-shell .type-display {
+  font-family: var(--font-display), Georgia, serif;
+  letter-spacing: -0.03em;
+  font-weight: 620;
+}
+
+.type-body,
+.portfolio-prose p,
+.portfolio-prose li {
+  font-size: 1.125rem;
+  line-height: 1.75;
+}
+
+.type-muted {
+  color: var(--muted);
+}
+
+.section-title {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(2.75rem, 7vw, 5.25rem);
+  line-height: 0.94;
+  letter-spacing: -0.035em;
+  font-weight: 650;
+}
+
+.section-index {
+  margin-bottom: 0.75rem;
+  font-size: 0.75rem;
   font-weight: 700;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
+  color: var(--accent);
 }
 
-.portfolio-prose p + p { margin-top: 1rem; }
-.portfolio-prose strong { color: white; }
-.portfolio-prose a { color: rgb(165 243 252); text-decoration: underline; text-underline-offset: 3px; }
-.portfolio-prose ul { margin-top: 1rem; padding-left: 1.2rem; }
-.portfolio-prose li::marker { color: rgb(103 232 249); }
-
-/* The public site is dark-first, but the toggle also needs a complete light
-   composition—not merely a white page behind dark surfaces. These rules are
-   deliberately scoped so the admin UI can keep using its Tailwind palette. */
-html:not(.dark) {
-  --background: #f5f8fc;
-  --foreground: #10233d;
+.portfolio-prose p + p {
+  margin-top: 1rem;
+}
+.portfolio-prose strong {
+  color: var(--foreground);
+}
+.portfolio-prose a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.portfolio-prose ul {
+  margin-top: 1rem;
+  padding-left: 1.2rem;
+}
+.portfolio-prose li::marker {
+  color: var(--accent);
 }
 
-html:not(.dark) .portfolio-shell {
-  background: #f5f8fc !important;
-  color: #10233d !important;
+.site-header {
+  background: color-mix(in srgb, var(--background) 82%, transparent);
+  border-bottom: 1px solid var(--rule);
+  backdrop-filter: blur(16px);
 }
 
-html:not(.dark) .portfolio-grid {
-  background-image: linear-gradient(rgba(15, 43, 78, 0.075) 1px, transparent 1px), linear-gradient(90deg, rgba(15, 43, 78, 0.075) 1px, transparent 1px);
+.hero-portrait {
+  position: relative;
+  padding: 1.75rem 1.5rem 0;
 }
 
-html:not(.dark) .portfolio-shell [class*='bg-[#07111f]'] { background-color: #f5f8fc !important; }
-html:not(.dark) .portfolio-shell [class*='bg-[#0c1a2d]'] { background-color: rgba(255, 255, 255, 0.84) !important; }
-html:not(.dark) .portfolio-shell [class*='bg-[#0d2139]'] { background-color: #dcecfb !important; }
-html:not(.dark) .portfolio-shell [class*='bg-[#102440]'] { background-color: rgba(255, 255, 255, 0.94) !important; }
-html:not(.dark) .portfolio-shell [class*='bg-[#091323]'] { background-color: #eff7ff !important; }
-html:not(.dark) .portfolio-shell [class*='bg-white/[0.045]'],
-html:not(.dark) .portfolio-shell [class*='bg-black/'],
-html:not(.dark) .portfolio-shell [class*='bg-[#07111f]/'] { background-color: rgba(255, 255, 255, 0.74) !important; }
-
-html:not(.dark) .portfolio-shell .text-white { color: #10233d !important; }
-html:not(.dark) .portfolio-shell .text-slate-100 { color: #17314f !important; }
-html:not(.dark) .portfolio-shell .text-slate-200 { color: #29415c !important; }
-html:not(.dark) .portfolio-shell .text-slate-300 { color: #405875 !important; }
-html:not(.dark) .portfolio-shell .text-slate-400,
-html:not(.dark) .portfolio-shell .text-slate-500 { color: #60738b !important; }
-html:not(.dark) .portfolio-shell .text-cyan-200,
-html:not(.dark) .portfolio-shell .text-cyan-100 { color: #087a9b !important; }
-html:not(.dark) .portfolio-shell [class*='text-cyan-200'],
-html:not(.dark) .portfolio-shell [class*='text-cyan-100'] { color: #087a9b !important; }
-html:not(.dark) .portfolio-shell .border-white\/10,
-html:not(.dark) .portfolio-shell .border-white\/15,
-html:not(.dark) .portfolio-shell .border-white\/20 { border-color: rgba(25, 67, 105, 0.14) !important; }
-
-html:not(.dark) .portfolio-shell .bg-cyan-200 { background-color: #0e7490 !important; }
-html:not(.dark) .portfolio-shell .bg-cyan-200.text-\[\#07111f\] { color: white !important; }
-html:not(.dark) .portfolio-shell [class*='from-[#091323]'] { --tw-gradient-from: #e9f5ff !important; }
-html:not(.dark) .portfolio-shell [class*='to-transparent'] { --tw-gradient-to: transparent !important; }
-html:not(.dark) .portfolio-shell .mix-blend-luminosity { mix-blend-mode: normal; }
-html:not(.dark) .portfolio-shell .text-transparent { color: transparent !important; }
-html:not(.dark) .portfolio-shell .shadow-black\/40 { --tw-shadow-color: rgba(25, 67, 105, 0.18) !important; }
-html:not(.dark) .portfolio-prose strong { color: #10233d; }
-html:not(.dark) .portfolio-prose a { color: #087a9b; }
-
-/* Strong, solid type gives the light layout the same hierarchy as dark mode. */
-html:not(.dark) .portfolio-shell h1,
-html:not(.dark) .portfolio-shell h2,
-html:not(.dark) .portfolio-shell h3 { color: #10233d !important; }
-html:not(.dark) .portfolio-shell .hero-outline-name {
-  color: #0b6683 !important;
-  -webkit-text-stroke: 0 !important;
+.hero-portrait::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  right: 8%;
+  bottom: 8%;
+  width: 70%;
+  height: 58%;
+  background: var(--accent-soft);
 }
 
-html:not(.dark) .portfolio-shell .contact-panel {
-  background: radial-gradient(circle at 85% 12%, rgba(34, 211, 238, 0.22), transparent 30%), linear-gradient(125deg, #e7f6ff, #f9fcff) !important;
-  border-color: rgba(8, 122, 155, 0.28) !important;
-  box-shadow: 0 24px 60px rgba(37, 99, 145, 0.1);
+.skills-sheet {
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--foreground) 7%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--foreground) 7%, transparent) 1px, transparent 1px);
+  background-size: 28px 28px;
 }
-html:not(.dark) .portfolio-shell .contact-channel {
-  background: rgba(255, 255, 255, 0.88) !important;
-  border-color: rgba(25, 67, 105, 0.14) !important;
-  box-shadow: 0 8px 20px rgba(37, 99, 145, 0.05);
+
+.lined-paper {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent,
+    transparent 31px,
+    color-mix(in srgb, var(--foreground) 7%, transparent) 32px
+  );
 }
-html:not(.dark) .portfolio-shell .contact-panel .text-slate-300 { color: #36516f !important; }
-html:not(.dark) .portfolio-shell .contact-panel .text-slate-100 { color: #17314f !important; }
+
+.contact-field {
+  width: 100%;
+  border: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+  background: color-mix(in srgb, var(--paper) 70%, transparent);
+  padding: 0.85rem 1rem;
+  font-size: 1.125rem;
+  line-height: 1.5;
+  color: inherit;
+  outline: none;
+}
+
+.contact-field:focus {
+  border-color: var(--accent);
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: var(--accent);
+  color: #fffcf7;
+  padding: 0.85rem 1.25rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+html.dark .btn-primary {
+  color: #12141a;
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid var(--rule);
+  padding: 0.85rem 1.25rem;
+  font-size: 0.95rem;
+  font-weight: 650;
+}
+
+.slide-stage {
+  position: relative;
+  min-height: 22rem;
+}
+
+.slide-card {
+  position: absolute;
+  inset: 0 10%;
+  transition:
+    transform 420ms ease,
+    opacity 420ms ease;
+  transform-origin: center center;
+}
+
+@media (min-width: 768px) {
+  .slide-stage {
+    min-height: 28rem;
+  }
+}
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
