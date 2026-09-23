@@ -32,6 +32,15 @@ const date = (value: string) =>
     year: "numeric",
   });
 
+function railLabel(experience: ExperienceItem, experiences: ExperienceItem[]) {
+  const sameCompany = experiences.filter(
+    (item) => item.company === experience.company,
+  ).length;
+  return sameCompany > 1
+    ? `${experience.company} · ${experience.role}`
+    : experience.company;
+}
+
 export function Experience({ experiences, resumeUrl }: ExperienceProps) {
   const [active, setActive] = useState(0);
   const selected = experiences[active];
@@ -43,26 +52,28 @@ export function Experience({ experiences, resumeUrl }: ExperienceProps) {
     >
       <div className="mx-auto max-w-360 px-5 py-20 md:px-10 lg:py-28">
         <SectionHeading index="04" title="Experience">
-          A short record of the roles I have held — pick a card to read more.
+          A short record of the roles I have held — pick an entry to read more.
         </SectionHeading>
 
         <div className="grid gap-10 lg:grid-cols-[15rem_minmax(0,1fr)] lg:items-start">
           <aside className="flex flex-col gap-3 lg:sticky lg:top-28">
-            <a href="#experience" className="experience-rail-link" aria-current="true">
-              Experience
-            </a>
-            <a href="#skills" className="experience-rail-link">
-              Expertise
-            </a>
-            <a href="#about" className="experience-rail-link">
-              About
-            </a>
+            {experiences.map((experience, index) => (
+              <button
+                type="button"
+                key={`${experience.company}-${experience.role}-${experience.startDate}`}
+                className="experience-rail-link"
+                aria-current={index === active}
+                onClick={() => setActive(index)}
+              >
+                {railLabel(experience, experiences)}
+              </button>
+            ))}
             {resumeUrl ? (
               <a
                 href={resumeUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="experience-rail-link mt-2 inline-flex items-center justify-center gap-2 border border-[var(--accent)] bg-transparent text-[var(--accent)]"
+                className="experience-rail-link mt-2 inline-flex items-center align-items justify-content gap-2 border border-[var(--accent)] bg-transparent text-[var(--accent)]"
               >
                 <Download className="h-4 w-4" />
                 View résumé
@@ -70,50 +81,30 @@ export function Experience({ experiences, resumeUrl }: ExperienceProps) {
             ) : null}
           </aside>
 
-          <div>
-            <h3 className="type-display text-2xl md:text-3xl">My experience</h3>
-            <p className="type-body type-muted mt-3 max-w-2xl">
-              Impactful roles in software engineering — the dates, titles, and
-              teams that shaped how I ship.
-            </p>
-
-            <ol className="mt-8 grid gap-4 sm:grid-cols-2">
-              {experiences.map((experience, index) => (
-                <li key={`${experience.company}-${experience.role}`}>
-                  <button
-                    type="button"
-                    className="experience-card h-full w-full"
-                    aria-pressed={index === active}
-                    onClick={() => setActive(index)}
-                  >
-                    <p className="text-sm font-bold text-[var(--accent)]">
-                      {date(experience.startDate)} —{" "}
-                      {experience.endDate ? date(experience.endDate) : "Present"}
-                    </p>
-                    <h4 className="type-display mt-3 text-xl leading-tight md:text-2xl">
-                      {experience.role}
-                    </h4>
-                    <p className="type-muted mt-2">
-                      <span className="mr-1 text-[var(--accent)]" aria-hidden="true">
-                        ›
-                      </span>
-                      {experience.company}
-                      {experience.employmentType
-                        ? ` · ${experience.employmentType}`
-                        : ""}
-                    </p>
-                  </button>
-                </li>
-              ))}
-            </ol>
-
-            {selected ? (
-              <div className="mt-8 border-t border-[var(--rule)] pt-8">
-                <p className="text-sm font-bold uppercase tracking-[0.16em] text-[var(--accent)]">
+          {selected ? (
+            <div>
+              <article className="experience-card">
+                <p className="text-sm font-bold text-[var(--accent)]">
+                  {date(selected.startDate)} —{" "}
+                  {selected.endDate ? date(selected.endDate) : "Present"}
+                </p>
+                <h3 className="type-display mt-3 text-2xl leading-tight md:text-3xl">
+                  {selected.role}
+                </h3>
+                <p className="type-muted mt-2">
+                  <span className="mr-1 text-[var(--accent)]" aria-hidden="true">
+                    ›
+                  </span>
                   {selected.company}
+                  {selected.employmentType
+                    ? ` · ${selected.employmentType}`
+                    : ""}
                   {selected.location ? ` · ${selected.location}` : ""}
                 </p>
-                <div className="portfolio-prose type-muted mt-4">
+              </article>
+
+              <div className="mt-8 border-t border-[var(--rule)] pt-8">
+                <div className="portfolio-prose type-muted">
                   <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
                     rehypePlugins={[rehypeSanitize]}
@@ -152,8 +143,8 @@ export function Experience({ experiences, resumeUrl }: ExperienceProps) {
                   ))}
                 </div>
               </div>
-            ) : null}
-          </div>
+            </div>
+          ) : null}
         </div>
       </div>
     </section>
