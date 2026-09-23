@@ -2,7 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight, Code2, ExternalLink, GitBranch } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowLeft, ArrowRight, ExternalLink, GitBranch } from "lucide-react";
+import { SectionHeading } from "@/components/public/SectionHeading";
 
 interface Project {
   id: string;
@@ -21,110 +23,187 @@ interface ProjectsProps {
 }
 
 export function Projects({ projects }: ProjectsProps) {
+  const [active, setActive] = useState(0);
+  const project = projects[active];
+
+  useEffect(() => {
+    function onKey(event: KeyboardEvent) {
+      if (event.key === "ArrowRight") {
+        setActive((current) => (current + 1) % Math.max(projects.length, 1));
+      }
+      if (event.key === "ArrowLeft") {
+        setActive((current) =>
+          current === 0 ? Math.max(projects.length - 1, 0) : current - 1,
+        );
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [projects.length]);
+
+  if (!project) {
+    return null;
+  }
+
+  const primaryLink =
+    project.links.find((link) => link.isPrimary) ??
+    project.links.find((link) => link.kind === "live") ??
+    project.links.find((link) => link.kind === "github");
+  const githubLink = project.links.find(
+    (link) => link.kind === "github" && link.url !== primaryLink?.url,
+  );
+
+  function go(direction: -1 | 1) {
+    setActive((current) => {
+      const next = current + direction;
+      if (next < 0) return projects.length - 1;
+      if (next >= projects.length) return 0;
+      return next;
+    });
+  }
+
   return (
     <section
       id="work"
-      className="mx-auto max-w-360 px-5 py-20 md:px-10 lg:py-32"
+      style={{
+        background: "var(--section-work)",
+        color: "var(--section-work-fg)",
+      }}
     >
-      <div className="mb-12 flex flex-col justify-between gap-5 md:flex-row md:items-end">
-        <div>
-          <p className="section-kicker">05 / Selected work</p>
-          <h2 className="mt-4 text-4xl font-black tracking-[-0.06em] text-white md:text-6xl">
-            Things I’ve brought to life.
-          </h2>
-        </div>
-        <p className="max-w-sm text-sm leading-6 text-slate-400">
-          A small, considered selection of products, experiments, and shipped
-          ideas.
-        </p>
-      </div>
-      <div className="grid gap-4 md:grid-cols-2">
-        {projects.map((project, index) => {
-          const primaryLink =
-            project.links.find((link) => link.isPrimary) ??
-            project.links.find((link) => link.kind === "live") ??
-            project.links.find((link) => link.kind === "github");
-          const githubLink = project.links.find(
-            (link) => link.kind === "github" && link.url !== primaryLink?.url,
-          );
-          return (
-            <article
-              key={project.id}
-              className={`group relative overflow-hidden rounded-4xl border border-white/10 bg-[#0c1a2d] ${index === 0 ? "md:col-span-2" : ""}`}
-            >
-              <div
-                className={`relative overflow-hidden ${index === 0 ? "aspect-16/7" : "aspect-4/3"}`}
+      <div className="mx-auto max-w-360 px-5 py-20 md:px-10 lg:py-28">
+        <SectionHeading index="05" title="Selected work" invert>
+          Browse the set like a deck — arrows, keyboard, or the film strip.
+        </SectionHeading>
+
+        <div className="slide-stage mb-8 overflow-hidden">
+          {projects.map((item, index) => {
+            const offset = index - active;
+            const image = item.coverImageUrl ?? item.gallery?.[0];
+            const visible = Math.abs(offset) <= 2;
+            return (
+              <button
+                type="button"
+                key={item.id}
+                onClick={() => setActive(index)}
+                aria-label={`Show ${item.title}`}
+                aria-current={index === active}
+                className="slide-card overflow-hidden border border-white/12 bg-[#1a1d24] text-left"
+                style={{
+                  opacity: visible ? (offset === 0 ? 1 : 0.45) : 0,
+                  transform: `translateX(${offset * 58}%) scale(${offset === 0 ? 1 : 0.82})`,
+                  zIndex: 20 - Math.abs(offset),
+                  pointerEvents: visible ? "auto" : "none",
+                }}
               >
-                {project.coverImageUrl ? (
-                  <Image
-                    src={project.coverImageUrl}
-                    alt=""
-                    fill
-                    className="object-cover opacity-70 transition duration-700 group-hover:scale-105 group-hover:opacity-90"
-                  />
-                ) : (
-                  <div
-                    className={`h-full w-full bg-[linear-gradient(135deg,rgba(34,211,238,.18),rgba(37,99,235,.18),rgba(139,92,246,.2))] ${index % 2 ? "bg-[radial-gradient(circle_at_70%_20%,rgba(34,211,238,.28),transparent_30%),linear-gradient(135deg,#122744,#0c1a2d)]" : ""}`}
-                  >
-                    <Code2 className="absolute right-8 top-8 h-16 w-16 text-white/10" />
-                  </div>
-                )}
-                <div className="absolute inset-0 bg-linear-to-t from-[#091323] via-[#091323]/30 to-transparent" />
-              </div>
-              <div className="absolute inset-x-0 bottom-0 p-6 md:p-8">
-                <div className="mb-3 flex items-center justify-between">
-                  <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-cyan-200">
-                    0{index + 1} / Project
-                  </span>
-                  <Link
-                    href={primaryLink?.url ?? "#"}
-                    aria-label={`View ${project.title} details`}
-                    className="grid h-9 w-9 place-items-center rounded-full border border-white/20 bg-black/20 text-white transition hover:bg-cyan-200 hover:text-[#07111f]"
-                  >
-                    <ArrowUpRight className="h-4 w-4" />
-                  </Link>
-                </div>
-                <h3 className="text-2xl font-bold tracking-[-0.04em] text-white md:text-3xl">
-                  {project.title}
-                </h3>
-                <p className="mt-2 max-w-xl text-sm leading-6 text-slate-300">
-                  {project.summary}
-                </p>
-                <div className="mt-5 flex flex-wrap items-center gap-2">
-                  {project.skills.slice(0, 6).map(({ skill }) => (
-                    <span
-                      className="rounded-full border border-white/15 bg-black/15 px-3 py-1 text-[10px] font-medium text-slate-200"
-                      key={skill.name}
-                    >
-                      {skill.name}
-                    </span>
-                  ))}
-                  {primaryLink && (
-                    <a
-                      href={primaryLink.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="ml-auto inline-flex items-center gap-1 text-xs font-bold text-cyan-200 hover:text-white"
-                    >
-                      {primaryLink.label} <ExternalLink className="h-3 w-3" />
-                    </a>
-                  )}
-                  {githubLink && (
-                    <a
-                      href={githubLink.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-xs font-bold text-cyan-200 hover:text-white"
-                    >
-                      <GitBranch className="h-3 w-3" />{" "}
-                      {githubLink.label || "Repository"}
-                    </a>
+                <div className="relative aspect-16/10">
+                  {image ? (
+                    <Image
+                      src={image}
+                      alt={item.title}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 1024px) 80vw, 48vw"
+                    />
+                  ) : (
+                    <div className="grid h-full place-items-center text-6xl font-black text-white/10">
+                      {String(index + 1).padStart(2, "0")}
+                    </div>
                   )}
                 </div>
-              </div>
-            </article>
-          );
-        })}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <p className="text-sm font-bold uppercase tracking-[0.18em] text-[var(--accent)]">
+            {String(active + 1).padStart(2, "0")} /{" "}
+            {String(projects.length).padStart(2, "0")}
+          </p>
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={() => go(-1)}
+              className="btn-ghost border-white/20"
+              aria-label="Previous project"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Prev
+            </button>
+            <button
+              type="button"
+              onClick={() => go(1)}
+              className="btn-ghost border-white/20"
+              aria-label="Next project"
+            >
+              Next
+              <ArrowRight className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+
+        <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
+          <div>
+            <h3 className="type-display text-4xl leading-tight md:text-5xl">
+              {project.title}
+            </h3>
+            <p className="type-body mt-5 opacity-80">{project.summary}</p>
+            <div className="mt-8 flex flex-wrap gap-4">
+              <Link href={`/projects/${project.slug}`} className="btn-primary">
+                Case notes
+              </Link>
+              {primaryLink && (
+                <a
+                  href={primaryLink.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-ghost border-white/20"
+                >
+                  {primaryLink.label} <ExternalLink className="h-4 w-4" />
+                </a>
+              )}
+              {githubLink && (
+                <a
+                  href={githubLink.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-sm font-semibold"
+                >
+                  <GitBranch className="h-4 w-4" />
+                  {githubLink.label || "Repository"}
+                </a>
+              )}
+            </div>
+          </div>
+          <div className="flex flex-wrap content-start gap-2 lg:justify-end">
+            {project.skills.slice(0, 8).map(({ skill }) => (
+              <span
+                key={skill.name}
+                className="h-fit border border-white/15 px-3 py-1 text-sm opacity-80"
+              >
+                {skill.name}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <ol className="mt-12 flex gap-2 overflow-x-auto pb-2">
+          {projects.map((item, index) => (
+            <li key={item.id} className="shrink-0">
+              <button
+                type="button"
+                onClick={() => setActive(index)}
+                className={`border px-3 py-2 text-sm ${
+                  index === active
+                    ? "border-[var(--accent)]"
+                    : "border-white/15 text-white/50 hover:text-white"
+                }`}
+              >
+                {String(index + 1).padStart(2, "0")} {item.title}
+              </button>
+            </li>
+          ))}
+        </ol>
       </div>
     </section>
   );
