@@ -7,6 +7,7 @@ import { Projects } from "@/components/public/Projects";
 import { Testimonials } from "@/components/public/Testimonials";
 import { Contact } from "@/components/public/Contact";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { getPublicContacts } from "@/lib/repositories/contactRepository";
 
 const parseJsonArray = (value: string | null): string[] | undefined => {
   if (!value) return undefined;
@@ -16,6 +17,13 @@ const parseJsonArray = (value: string | null): string[] | undefined => {
   } catch {
     return undefined;
   }
+};
+
+const hrefForChannel = (kind: string, value: string) => {
+  if (kind === "email") return `mailto:${value}`;
+  if (kind === "phone") return `tel:${value}`;
+  if (kind === "whatsapp") return `https://wa.me/${value.replace(/\D/g, "")}`;
+  return value;
 };
 
 export default async function PortfolioPage() {
@@ -40,15 +48,12 @@ export default async function PortfolioPage() {
         where: { isApproved: true, isFeatured: true },
         orderBy: { sortOrder: "asc" },
       }),
-      prisma.contactChannel.findMany({
-        where: { isPublic: true },
-        orderBy: { sortOrder: "asc" },
-      }),
+      getPublicContacts(),
     ]);
 
   if (!profile) {
     return (
-      <div className="grid min-h-screen place-items-center bg-[#07111f] p-8 text-center text-white">
+      <div className="grid min-h-screen place-items-center p-8 text-center">
         Profile not found. Please seed the database.
       </div>
     );
@@ -103,59 +108,60 @@ export default async function PortfolioPage() {
     rating: testimonial.rating,
     sourceUrl: testimonial.sourceUrl,
   }));
-  const formattedContacts = contacts.map((contact) => ({
+  const publicContacts = contacts.filter(
+    (contact): contact is NonNullable<typeof contact> => Boolean(contact),
+  );
+  const formattedContacts = publicContacts.map((contact) => ({
     id: contact.id,
     kind: contact.kind,
     label: contact.label,
-    value: null,
+    value: contact.value,
   }));
-  const publicSocials = contacts
+  const publicSocials = publicContacts
     .filter((contact) => contact.kind !== "email" && contact.kind !== "phone")
     .map((contact) => ({
       kind: contact.kind,
-      url: "https://github.com/Germanium-Jeremy",
+      url: hrefForChannel(contact.kind, contact.value),
       iconKey: contact.iconKey ?? undefined,
     }));
   const funFacts = parseJsonArray(profile.funFacts) ?? [];
 
   return (
-    <div className="portfolio-shell min-h-screen overflow-hidden bg-[#07111f] text-[#ecf4ff] selection:bg-cyan-300 selection:text-[#07111f]">
-      <div className="portfolio-grid pointer-events-none fixed inset-0 z-0 opacity-40" />
-      <div className="pointer-events-none fixed -left-52 top-0 z-0 h-152 w-152 rounded-full bg-blue-500/20 blur-[150px]" />
-      <div className="pointer-events-none fixed -right-52 top-128 z-0 h-128 w-lg rounded-full bg-violet-500/15 blur-[140px]" />
-
-      <header className="fixed inset-x-0 top-0 z-50 mx-auto flex h-24 max-w-360 items-center justify-between px-5 md:px-10">
-        <a
-          href="#top"
-          className="group flex items-center gap-2 text-sm font-bold tracking-[-0.04em] text-white"
-          aria-label="Back to top"
-        >
-          <span className="grid h-9 w-9 place-items-center rounded-full border border-white/20 bg-white/10 text-cyan-200 transition-transform duration-300 group-hover:rotate-12">
-            ✦
-          </span>
-          <span className="hidden sm:block">{profile.fullName}</span>
-        </a>
-        <nav
-          aria-label="Primary navigation"
-          className="hidden items-center gap-6 rounded-full border border-white/10 bg-[#0c1a2d]/70 px-6 py-3 text-xs font-medium text-slate-300 backdrop-blur-xl lg:flex"
-        >
-          <a className="transition-colors hover:text-cyan-200" href="#about">
-            About
+    <div className="portfolio-shell min-h-screen selection:bg-[var(--accent)] selection:text-[#fffaf3]">
+      <header className="site-header fixed inset-x-0 top-0 z-50">
+        <div className="mx-auto flex h-20 max-w-360 items-center justify-between px-5 md:px-10">
+          <a
+            href="#top"
+            className="text-sm font-bold tracking-[0.08em] uppercase"
+            aria-label="Back to top"
+          >
+            {profile.fullName}
           </a>
-          <a className="transition-colors hover:text-cyan-200" href="#skills">
-            Expertise
-          </a>
-          <a className="transition-colors hover:text-cyan-200" href="#work">
-            Selected work
-          </a>
-          <a className="transition-colors hover:text-cyan-200" href="#contact">
-            Contact
-          </a>
-        </nav>
-        <ThemeToggle />
+          <nav
+            aria-label="Primary navigation"
+            className="hidden items-center gap-6 text-sm font-medium text-[var(--muted)] lg:flex"
+          >
+            <a className="hover:text-[var(--accent)]" href="#about">
+              About
+            </a>
+            <a className="hover:text-[var(--accent)]" href="#skills">
+              Expertise
+            </a>
+            <a className="hover:text-[var(--accent)]" href="#experience">
+              Experience
+            </a>
+            <a className="hover:text-[var(--accent)]" href="#work">
+              Work
+            </a>
+            <a className="hover:text-[var(--accent)]" href="#contact">
+              Contact
+            </a>
+          </nav>
+          <ThemeToggle />
+        </div>
       </header>
 
-      <main id="top" className="relative z-10">
+      <main id="top">
         <Hero
           profile={{
             fullName: profile.fullName,
@@ -175,15 +181,11 @@ export default async function PortfolioPage() {
         <Contact channels={formattedContacts} />
       </main>
 
-      <footer className="relative z-10 mx-auto flex max-w-360 flex-col gap-4 border-t border-white/10 px-5 py-8 text-xs text-slate-400 sm:flex-row sm:items-center sm:justify-between md:px-10">
+      <footer className="mx-auto flex max-w-360 flex-col gap-4 border-t border-[var(--rule)] px-5 py-8 text-base text-[var(--muted)] sm:flex-row sm:items-center sm:justify-between md:px-10">
         <p>
-          © {new Date().getFullYear()} {profile.fullName}. Built with care and
-          Next.js.
+          © {new Date().getFullYear()} {profile.fullName}
         </p>
-        <a
-          href="#top"
-          className="font-medium text-cyan-200 transition-colors hover:text-white"
-        >
+        <a href="#top" className="font-medium text-[var(--accent)]">
           Back to top ↑
         </a>
       </footer>
