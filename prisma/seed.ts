@@ -364,7 +364,7 @@ async function main() {
     {
       kind: "github",
       label: "GitHub",
-      value: "https://github.com/jeremy",
+      value: "https://github.com/Germanium-Jeremy",
       isPublic: true,
     },
     {
