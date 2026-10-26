@@ -193,6 +193,26 @@ model Testimonial {
   @@map("testimonials")
 }
 
+model Certificate {
+  id            String    @id @default(cuid())
+  title         String
+  issuer        String
+  issuedAt      DateTime
+  expiresAt     DateTime? // null = no expiry
+  credentialId  String?
+  credentialUrl String?
+  description   String? // markdown
+  fileUrl       String? // Vercel Blob URL of the source material
+  fileType      String? // "image" | "pdf"
+  fileName      String?
+  sortOrder     Int       @default(0)
+  isVisible     Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("certificates")
+}
+
 model SiteSetting {
   key       String   @id
   value     Json
