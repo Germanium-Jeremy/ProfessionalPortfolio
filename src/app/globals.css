@@ -17,6 +17,7 @@
   --section-work: #12141a;
   --section-work-fg: #f4f1ea;
   --section-quotes: #efe4d6;
+  --section-credentials: #e4e8ee;
   --section-contact: #1b335c;
   --section-contact-fg: #f4f1ea;
 }
@@ -38,6 +39,7 @@ html.dark {
   --section-work: #0c0e12;
   --section-work-fg: #efece4;
   --section-quotes: #1c1813;
+  --section-credentials: #14181e;
   --section-contact: #15243c;
   --section-contact-fg: #efece4;
 }
@@ -222,6 +224,73 @@ html.dark .experience-rail-link[aria-current="true"] {
     transparent 31px,
     color-mix(in srgb, var(--foreground) 7%, transparent) 32px
   );
+}
+
+.certificate-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--rule);
+  background: var(--paper);
+}
+
+.certificate-document {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-bottom: 1px solid var(--rule);
+  background: color-mix(in srgb, var(--foreground) 6%, transparent);
+}
+
+.certificate-document-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 0.5rem;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.certificate-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 1.4rem;
+}
+
+.certificate-index {
+  margin-bottom: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: var(--accent);
+}
+
+.certificate-meta {
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+.certificate-description {
+  margin-top: 1rem;
+}
+
+.certificate-description p,
+.certificate-description li {
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.certificate-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: auto;
+  padding-top: 1.5rem;
 }
 
 .contact-field {
