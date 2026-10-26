@@ -10,7 +10,7 @@ const DEFAULT_SETTINGS: Record<string, unknown> = {
   accentColor: '#3b82f6',
   siteTitle: 'Portfolio',
   siteDescription: 'Personal portfolio and project showcase',
-  sectionOrder: ['hero', 'about', 'skills', 'experience', 'projects', 'testimonials', 'contact'],
+  sectionOrder: ['hero', 'about', 'skills', 'experience', 'projects', 'testimonials', 'certificates', 'contact'],
   sectionVisibility: {
     hero: true,
     about: true,
@@ -18,6 +18,7 @@ const DEFAULT_SETTINGS: Record<string, unknown> = {
     experience: true,
     projects: true,
     testimonials: true,
+    certificates: true,
     contact: true,
   },
 };
