@@ -5,9 +5,11 @@ import { Skills } from "@/components/public/Skills";
 import { Experience } from "@/components/public/Experience";
 import { Projects } from "@/components/public/Projects";
 import { Testimonials } from "@/components/public/Testimonials";
+import { Certificates } from "@/components/public/Certificates";
 import { Contact } from "@/components/public/Contact";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { getPublicContacts } from "@/lib/repositories/contactRepository";
+import { getPublicCertificates } from "@/lib/repositories/certificateRepository";
 
 const parseJsonArray = (value: string | null): string[] | undefined => {
   if (!value) return undefined;
@@ -27,8 +29,15 @@ const hrefForChannel = (kind: string, value: string) => {
 };
 
 export default async function PortfolioPage() {
-  const [profile, skills, experiences, projects, testimonials, contacts] =
-    await Promise.all([
+  const [
+    profile,
+    skills,
+    experiences,
+    projects,
+    testimonials,
+    certificates,
+    contacts,
+  ] = await Promise.all([
       prisma.profile.findFirst(),
       prisma.skill.findMany({ orderBy: { sortOrder: "asc" } }),
       prisma.experience.findMany({
@@ -48,6 +57,7 @@ export default async function PortfolioPage() {
         where: { isApproved: true, isFeatured: true },
         orderBy: { sortOrder: "asc" },
       }),
+      getPublicCertificates(),
       getPublicContacts(),
     ]);
 
@@ -108,6 +118,18 @@ export default async function PortfolioPage() {
     rating: testimonial.rating,
     sourceUrl: testimonial.sourceUrl,
   }));
+  const formattedCertificates = certificates.map((certificate) => ({
+    id: certificate.id,
+    title: certificate.title,
+    issuer: certificate.issuer,
+    issuedAt: certificate.issuedAt.toISOString(),
+    expiresAt: certificate.expiresAt?.toISOString() ?? null,
+    credentialId: certificate.credentialId,
+    credentialUrl: certificate.credentialUrl,
+    description: certificate.description,
+    fileUrl: certificate.fileUrl,
+    fileType: certificate.fileType,
+  }));
   const publicContacts = contacts.filter(
     (contact): contact is NonNullable<typeof contact> => Boolean(contact),
   );
@@ -153,6 +175,9 @@ export default async function PortfolioPage() {
             <a className="hover:text-[var(--accent)]" href="#work">
               Work
             </a>
+            <a className="hover:text-[var(--accent)]" href="#certificates">
+              Credentials
+            </a>
             <a className="hover:text-[var(--accent)]" href="#contact">
               Contact
             </a>
@@ -181,6 +206,7 @@ export default async function PortfolioPage() {
         />
         <Projects projects={formattedProjects} />
         <Testimonials testimonials={formattedTestimonials} />
+        <Certificates certificates={formattedCertificates} />
         <Contact channels={formattedContacts} />
       </main>
 
