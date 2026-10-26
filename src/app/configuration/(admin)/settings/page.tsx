@@ -23,8 +23,11 @@ const SECTION_LABELS: Record<string, string> = {
   experience: 'Experience',
   projects: 'Projects',
   testimonials: 'Testimonials',
+  certificates: 'Certificates & Awards',
   contact: 'Contact',
 };
+
+const SECTION_KEYS = Object.keys(SECTION_LABELS);
 
 const DEFAULT_SETTINGS: Settings = {
   seoTitle: '',
@@ -32,17 +35,19 @@ const DEFAULT_SETTINGS: Settings = {
   accentColor: '#3b82f6',
   siteTitle: 'Portfolio',
   siteDescription: 'Personal portfolio and project showcase',
-  sectionOrder: ['hero', 'about', 'skills', 'experience', 'projects', 'testimonials', 'contact'],
-  sectionVisibility: {
-    hero: true,
-    about: true,
-    skills: true,
-    experience: true,
-    projects: true,
-    testimonials: true,
-    contact: true,
-  },
+  sectionOrder: SECTION_KEYS,
+  sectionVisibility: Object.fromEntries(
+    SECTION_KEYS.map((key) => [key, true]),
+  ),
 };
+
+// Sections added after the settings were last saved are appended in place.
+function normalizeSectionOrder(order: string[]) {
+  return [
+    ...order.filter((key) => SECTION_KEYS.includes(key)),
+    ...SECTION_KEYS.filter((key) => !order.includes(key)),
+  ];
+}
 
 export default function SettingsPage() {
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
@@ -55,14 +60,21 @@ export default function SettingsPage() {
         const res = await fetch('/api/configuration/settings');
         const result = await res.json();
         if (result.ok && result.data) {
+          const sectionOrder = normalizeSectionOrder(
+            result.data.sectionOrder ?? DEFAULT_SETTINGS.sectionOrder,
+          );
+          const storedVisibility =
+            result.data.sectionVisibility ?? DEFAULT_SETTINGS.sectionVisibility;
           setSettings({
             seoTitle: result.data.seoTitle ?? DEFAULT_SETTINGS.seoTitle,
             seoDescription: result.data.seoDescription ?? DEFAULT_SETTINGS.seoDescription,
             accentColor: result.data.accentColor ?? DEFAULT_SETTINGS.accentColor,
             siteTitle: result.data.siteTitle ?? DEFAULT_SETTINGS.siteTitle,
             siteDescription: result.data.siteDescription ?? DEFAULT_SETTINGS.siteDescription,
-            sectionOrder: result.data.sectionOrder ?? DEFAULT_SETTINGS.sectionOrder,
-            sectionVisibility: result.data.sectionVisibility ?? DEFAULT_SETTINGS.sectionVisibility,
+            sectionOrder,
+            sectionVisibility: Object.fromEntries(
+              SECTION_KEYS.map((key) => [key, storedVisibility[key] ?? true]),
+            ),
           });
         }
       } catch {
