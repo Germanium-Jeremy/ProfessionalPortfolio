@@ -1,7 +1,7 @@
 import { requireSession } from '@/lib/auth';
 import { getAdminProfile } from '@/lib/repositories/profileRepository';
 import Link from 'next/link';
-import { LayoutDashboard, User, Briefcase, GraduationCap, Settings, LogOut, Wrench, Quote, Contact } from 'lucide-react';
+import { LayoutDashboard, User, Briefcase, GraduationCap, Settings, LogOut, Wrench, Quote, Contact, Award } from 'lucide-react';
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   await requireSession();
@@ -14,6 +14,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     { href: '/configuration/experience', label: 'Experience', icon: GraduationCap },
     { href: '/configuration/skills', label: 'Skills', icon: Wrench },
     { href: '/configuration/testimonials', label: 'Testimonials', icon: Quote },
+    { href: '/configuration/certificates', label: 'Certificates', icon: Award },
     { href: '/configuration/contacts', label: 'Contacts', icon: Contact },
     { href: '/configuration/settings', label: 'Settings', icon: Settings },
   ];
